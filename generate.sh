@@ -1,1 +1,2 @@
-g++ src/inclusive.hpp -M | sed 's/\/usr\/include\/stdc-predef.h//' | sed 's/inclusive.o://' | sed 's/\\//g' | tac | xargs cat > inclusive.hpp
+./embed.py -I./ -I/opt/libs/boost_1_62_0 src/inclusive.hpp -o inclusive.hpp
+echo "#include \"deps.hpp\"" >> inclusive.hpp
