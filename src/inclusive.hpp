@@ -5,11 +5,11 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/expand.hpp>
 
-#ifdef INCLUSIVE_DISABLE
+#ifdef INCLUSIVE_DISABLED
   #define INCLUSIVE(NAMESPACE, HEADER) #HEADER
-#else // INCLUSIVE_DISABLE 
+#else // INCLUSIVE_DISABLED 
   #define INCLUSIVE(NAMESPACE, HEADER) BOOST_PP_STRINGIZE( BOOST_PP_EXPAND(BOOST_PP_CAT(INCLUSIVE_,NAMESPACE))HEADER)
-#endif // INCLUSIVE_DISABLE 
+#endif // INCLUSIVE_DISABLED 
 
 #endif
 

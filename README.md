@@ -24,7 +24,7 @@ It simply provides you with a way to package inside **your github repository** t
 Users just need to include your folder. The rest is done by `#inclusive`.
 
 ## Adding a library in 3 steps
-[We only support header only dependencies](doc/rationale/WHY_HEADER_ONLY.md), to add one do the following : 
+[We just support header-only dependencies](doc/rationale/WHY_HEADER_ONLY.md). Taking the example of [depending on Boost.Preprocessor](examples/simple) :
 
   1. Add it as git subtree : `git subtree add --prefix examples/simple/include/somelib/inclusive/boost-preprocessor git@github.com:boostorg/preprocessor.git boost-1.62.0 --squash`
   2. Copy/paste the header `inclusive.hpp` & add a `deps.hpp` to list your dependencies :
@@ -44,4 +44,14 @@ Users just need to include your folder. The rest is done by `#inclusive`.
       ```
 
 Finally you are done ! You can now compile any app using your library with : 
-  * `g++ -I/path/to/somelib yourprogram.cpp`
+  * `g++ -I/path/to/somelib yourprogram.cpp` : Shipped-with dependencies are used : it's all-inclusive. 
+  * `g++ -I/path/to/somelib yourprogram.cpp -DINCLUSIVE_DISABLED` : Dependencies are searched elsewhere ( *e.g.* /usr/include )
+
+## Why not just copying the Headers in my code ?
+
+  - You can either use git submodule / subtree to refer to your dependencies
+  - You can ship your library for users that just include your folder
+  - **BUT** you can as well provide a CMakeLists.txt which installs your headers in the user system/sysroot
+    * allowing your user to change the library version
+    * allowing your user to avoid having multiple copy of the library
+    * allowing your user depend on your CMake PackageConfig to get the correct compile flags.
