@@ -1,5 +1,5 @@
 #include <somelib/somelib.hpp>
 
-void main() {
+main() {
   somelib::hello_world();
 }
