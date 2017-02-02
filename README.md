@@ -1,4 +1,4 @@
-# \#inclusive : C++ dependencies made easy.
+# `\#inclusive` : C++ dependencies made easy.
 As a library author you have to ensure the library can be used easily. 
 
 The problem is that a library user might get an hard time to consume a C++ library ! Dependency management is hard in C++ because there are :
