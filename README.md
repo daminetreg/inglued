@@ -1,9 +1,9 @@
 # `#inclusive` : C++ dependencies made easy.
-As a library author you have to ensure the library can be used easily. 
+As a library author you have to ensure your library can be used easily. 
 
-The problem is that a library user might get an hard time to consume a C++ library ! Dependency management is hard in C++ because there are :
+The problem is that your users might get an hard time to consume your C++ library, if you do depend on some else library ! Dependency management is hard in C++ because there are :
   - so much target platform
-  - so much build systems (cmake, visual studion, scons, autotools, bjam, waf, gyp,...)
+  - so much build systems (cmake, visual studio, scons, autotools, bjam, waf, gyp,...)
   - so much kind of users
 
 Your library will be consumed by two different kind of users :
@@ -27,15 +27,17 @@ Users just need to include your folder. The rest is done by `#inclusive`.
 [We only support header only dependencies](doc/rationale/WHY_HEADER_ONLY.md), to add one do the following : 
 
   1. Add it as git subtree : `git subtree add --prefix examples/simple/include/somelib/inclusive/boost-preprocessor git@github.com:boostorg/preprocessor.git boost-1.62.0 --squash`
-  2. Copy/paste the header `inclusive.hpp`
-  3. Add a `deps.hpp` to list your dependencies :
+  2. Copy/paste the header `inclusive.hpp` & add a `deps.hpp` to list your dependencies :
+
       ```cpp
       #ifndef SOMELIB_INCLUSIVE_HPP
       #define SOMELIB_INCLUSIVE_HPP
         #define INCLUSIVE_boost_preprocessor inclusive/boost-preprocessor/include
       #endif
       ```
+
   3. In your code use the dependency as follows: 
+
       ```cpp
       #include <inclusive>
       #include INCLUSIVE(boost_preprocessor,boost/preprocessor/stringize.hpp)
