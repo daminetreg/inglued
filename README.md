@@ -11,34 +11,35 @@ Your library will be consumed by two different kind of users :
   - The system builder which wants clean sysroot and good transitive CMake package dependency.
 
 # We make the app developer and the system packager happy 
-Here is a solution to provide your library easily to your users, **without needing** your users to install **yet another tool**.
+Here is a solution to provide your library easily to your users, **without needing** neither you nor your users to install **yet another tool**.
 
-With **One single line** your library will be available :
+With **One single line more** your library will be available :
 
-  - As CMake dependency (CMake Package Config)
   - Direct Integration of transitive dependencies by copy/paste in user project
   - Integration via installation in sysroot setup of include paths, 
 
 # How does it work ?
-It simply generates a concatenated header of all your dependencies based on a **oneliner configuration** using **github** as datasource for dependency inclusion. 
+It simply provides you with a way to package inside **your github repository** the dependencies you need. 
 
-In your project deposit anywhere a .inclusive file (You can hide this to your user):
-```json
-{
-  "this" : "<mylib/?>",
-  "deps" : {
-    "<boost/preprocessor/?>" : "boostorg/preprocessor.github",
-    "<pre/type_traits/?>" : "cpp-pre/type_traits.git",
-  }
-}
-```
+Users just need to include your folder. The rest is done by `#inclusive`.
 
-## Generate your **shippable / git commitable** dependency : 
-It will use the compiler it finds on the path between gcc, clang or msvc :
+## Adding a library in 3 steps
+[We only support header only dependencies](doc/rationale/WHY_HEADER_ONLY.md), to add one do the following : 
 
-* `inclusive <path/to/your/headers>`
-* or `inclusive <master-unit-test.cpp>`
+  1. Add it as git subtree : `git subtree add --prefix inclusive/boost-preprocessor boost-preprocessor boost-1.62.0 --squash`
+  2. Copy/paste the header `inclusive.hpp`
+  3. Add a `deps.hpp` to list your dependencies :
+      ```cpp
+      #ifndef SOMELIB_INCLUSIVE_HPP
+      #define SOMELIB_INCLUSIVE_HPP
+        #define INCLUSIVE_boost_preprocessor inclusive/boost-preprocessor/include
+      #endif
+      ```
+  3. In your code use the dependency as follows: 
+      ```cpp
+      #include <inclusive>
+      #include INCLUSIVE(boost_preprocessor,boost/preprocessor/stringize.hpp)
+      ```
 
-It does only include the library listed in **.inclusive**, so **std** and other system expected libraries are not.
-
-The header generated will be placed in the folder include path specified by *this* key.
+Finally you are done ! You can now compile any app using your library with : 
+  * `g++ -I/path/to/somelib yourprogram.cpp`

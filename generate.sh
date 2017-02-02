@@ -1,1 +1,1 @@
-/opt/softwares/emsdk_portable/emscripten/master/em++    -I../.. -I../../js/inclusive/cpp-pre-type_traits -I../../js/inclusive/boost-preprocessor/include  -std=c++14 ../../js/bind.hpp -M | grep -v -E "(libcxx/)|(libc/)" | sed 's/bind.o://' | sed 's/\\//g' | tac | xargs cat > preprocessed.cpp
+g++ src/inclusive.hpp -M | sed 's/\/usr\/include\/stdc-predef.h//' | sed 's/inclusive.o://' | sed 's/\\//g' | tac | xargs cat > inclusive.hpp
