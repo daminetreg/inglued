@@ -50,6 +50,7 @@ Finally you are done ! You can now compile any app using your library with :
 ## Why not just copying the Headers in my code ?
 
   - You can either use git submodule / subtree to refer to your dependencies
+  - You can adapt to the folder hierarchy of the dependency in `deps.hpp`
   - You can ship your library for users that just include your folder
   - **BUT** you can as well provide a CMakeLists.txt which installs your headers in the user system/sysroot
     * allowing your user to change the library version
