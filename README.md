@@ -26,7 +26,7 @@ Users just need to include your folder. The rest is done by `#inclusive`.
 ## Adding a library in 3 steps
 [We only support header only dependencies](doc/rationale/WHY_HEADER_ONLY.md), to add one do the following : 
 
-  1. Add it as git subtree : `git subtree add --prefix inclusive/boost-preprocessor boost-preprocessor boost-1.62.0 --squash`
+  1. Add it as git subtree : `git subtree add --prefix examples/simple/include/somelib/inclusive/boost-preprocessor git@github.com:boostorg/preprocessor.git boost-1.62.0 --squash`
   2. Copy/paste the header `inclusive.hpp`
   3. Add a `deps.hpp` to list your dependencies :
       ```cpp
