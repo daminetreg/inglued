@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
+#include <map>
 #include <regex>
 #include <boost/format.hpp>
 #include <nlohmann/json.hpp>
@@ -54,13 +54,13 @@ namespace inclusive {
   };
 
   //! Reads the list of deps in the deps.inclusive json file.
-  inline std::vector<dep> read_deps(const std::string&& path) {
+  inline std::map<std::string, dep> read_deps(const std::string& path) {
     std::ifstream ifs(path.data(), std::ios::in );
 
     nlohmann::json j;
     ifs >> j;
 
-    std::vector<dep> deps;
+    std::map<std::string, dep> deps;
     for (nlohmann::json::iterator it = j.begin(); it != j.end(); ++it) {
       dep d;
       d.git_uri = it.key();
@@ -70,14 +70,14 @@ namespace inclusive {
         d.include_path = it.value()["?"].get<std::string>();
       }
 
-      deps.push_back(d);
+      deps[d.git_uri] = d;
     }
 
     return deps;
   }
 
 
-  //! TODO: run git to install the dep if not already present
+  //! Run git to install the dep if not already present
   inline void check_and_clone(const dep& d) {
 
     bp::system(bp::shell, "git", "subtree", (fs::exists(d.get_name()) ? "pull" : "add"),
@@ -86,6 +86,23 @@ namespace inclusive {
       "--squash");
 
   }
+
+  //! Delves in each dependencies at 1 depth level and lookup for further includesive deps. If some pull them up here.
+  inline void hikeup_deep_deps(std::map<std::string, dep>& deps) {
+
+    for (auto& d : deps) {
+      auto tape = fs::path(d.second.get_name()) / "deps" / ".tape";
+      if (fs::exists(tape)) {
+        auto deep_deps = read_deps(tape.native());
+        deps.insert(deep_deps.begin(), deep_deps.end());
+      }
+    }
+
+    // Now that we have hiked up the deps of our deps, clone and add them again at our level.
+    // We have to duplicate the files because macOS, linux ok but windows-git-clone symlinks impossible.
+    for (auto& d : deps) { check_and_clone(d.second); }
+  }
+
 
   //TODO: Generate CMakeLists.txt to include the stuffs
   //TODO: Generate CONSUME.md with all compilers include path generated to explain how to use.
@@ -97,7 +114,8 @@ namespace inclusive {
 int main() {
   auto deps = inclusive::read_deps(".tape"); 
 
-  for (auto& d : deps) { inclusive::check_and_clone(d); }
+  for (auto& d : deps) { inclusive::check_and_clone(d.second); }
+  hikeup_deep_deps(deps);
 
   return 0;
 }
