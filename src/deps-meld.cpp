@@ -81,7 +81,7 @@ namespace inclusive {
   inline void check_and_clone(const dep& d) {
 
     bp::system(bp::shell, "git", "subtree", (fs::exists(d.get_name()) ? "pull" : "add"),
-      "--prefix", d.get_name(),
+      "--prefix", std::string("deps/") + d.get_name(),
       d.get_uri(), d.ref,
       "--squash");
 
@@ -112,7 +112,7 @@ namespace inclusive {
   
 
 int main() {
-  auto deps = inclusive::read_deps(".tape"); 
+  auto deps = inclusive::read_deps("deps/.tape"); 
 
   for (auto& d : deps) { inclusive::check_and_clone(d.second); }
   hikeup_deep_deps(deps);
