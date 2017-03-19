@@ -5,6 +5,7 @@
 #include <regex>
 #include <boost/format.hpp>
 #include <nlohmann/json.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/process.hpp>
 #include <boost/filesystem.hpp>
 
@@ -101,7 +102,7 @@ namespace inclusive {
   }
 
   //! Reads the list of deps in the deps.inclusive json file.
-  inline void write_deps(const std::string& path, const std::map<std::string, dep>& deps, bool write_direct = false) {
+  inline void write_transitive_deps(const std::string& path, const std::map<std::string, dep>& deps) {
     auto to_json = [](auto d) {
       nlohmann::json dep_j;
       dep_j["@"] = d.second.ref;
@@ -113,19 +114,7 @@ namespace inclusive {
       return dep_j;
     };
 
-    if (write_direct) { // Direct dependencies
-      std::fstream ofs(path.data(), std::ios::in | std::ios::out | std::ios::trunc );
-      nlohmann::json j;
-
-      for (auto& dep_entry : deps ) {
-        if (!dep_entry.second.transitive) {
-          j[dep_entry.first] = to_json(dep_entry);
-        }
-      }
-
-      ofs << j.dump(2);
-    }
-
+    auto transitive_path = (path + ".transitive");
     { // Transitive dependencies
 
       nlohmann::json j;
@@ -136,11 +125,19 @@ namespace inclusive {
       }
 
       if (j.size() > 0) {
-        auto transitive_path = (path + ".transitive");
         std::fstream ofs(transitive_path.data(), std::ios::in | std::ios::out | std::ios::trunc );
         ofs << j.dump(2);
       }
     }
+
+    auto commit_transitive_manifest = [&transitive_path]() {
+      bp::system(bp::shell, "git", "add", transitive_path);
+      bp::system(bp::shell, "git", "commit", transitive_path, 
+        "-m", "\"#glued : transitive dependencies manifest.\"");
+    };
+
+    commit_transitive_manifest();
+
   }
 
 
@@ -154,7 +151,7 @@ namespace inclusive {
       "--squash");
 
     if (returncode != 0) {
-      throw std::runtime_error("Cannot add the dependency, your working tree must be all commited first!");
+      throw std::runtime_error("Cannot add the dependency, your working tree must not have changes to already commited files.");
     }
   }
 
@@ -175,14 +172,14 @@ namespace inclusive {
     }
 
     // Write down the transitive deps
-    write_deps(GLUE_PATH, deps);   
+    write_transitive_deps(GLUE_PATH, deps);
 
     // Now that we have hiked up the deps of our deps, clone and add them again at our level.
     // We have to duplicate the files because windows-git-clone symlinks impossible. Sad.
-    for (auto& d : deps) { check_and_clone(d.second); }
+    for (auto& d : deps) { if (d.second.transitive) { check_and_clone(d.second); } }
   }
 
-
+  //TODO: Inform user of what happenned
   //TODO: Generate CMakeLists.txt to include the stuffs
   //TODO: Generate CONSUME.md with all compilers include path generated to explain how to use.
 
@@ -190,11 +187,32 @@ namespace inclusive {
 
   
 
-int main() {
-  auto deps = inclusive::read_deps(inclusive::GLUE_PATH); 
+int main(int argc, const char* argv[]) {
+  
+  using boost::algorithm::ends_with;
 
-  for (auto& d : deps) { inclusive::check_and_clone(d.second); }
-  hikeup_deep_deps(deps);
+  if ( (argc <= 1) || ( (argc > 1) && (ends_with(argv[1],"help")) ) ) {
+    std::cout << "#glued : The header-only dependency manager for library authors.\n";
+    std::cout << "\n";
+
+    std::cout << "Simply make a deps/glue file listing your header-only github dependencies, \n"
+                 "and glue will commit them to your repository !\n"
+                 "\n"
+                 "Actually the best way for your users to consume libraries : just clone / download\n"
+                 "and all is in the package!\n"
+                 "No git-submodule but good old git-subtree !\n"
+                 << std::endl;
+
+
+  } else if (argc >= 2) {
+
+    if (std::string(argv[1]) == "sync") {
+      auto deps = inclusive::read_deps(inclusive::GLUE_PATH); 
+      for (auto& d : deps) { inclusive::check_and_clone(d.second); }
+      hikeup_deep_deps(deps);
+    }
+
+  }
 
   return 0;
 }
