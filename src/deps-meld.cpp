@@ -185,11 +185,20 @@ namespace inclusive {
     }
 
     // Write down the transitive deps
+    std::cout << "Declaring the transitive dependencies." << std::endl;
     write_transitive_deps(GLUE_PATH, deps);
+    std::cout << std::endl;
 
+    std::cout << "Fetching and glueing in your git repository transitive dependencies:" << std::endl;
     // Now that we have hiked up the deps of our deps, clone and add them again at our level.
     // We have to duplicate the files because windows-git-clone symlinks impossible. Sad.
-    for (auto& d : deps) { if (d.second.transitive) { check_and_clone(d.second); } }
+    for (auto& d : deps) {
+      if (d.second.transitive) {
+        inclusive::check_and_clone(d.second); 
+        std::cout << "\t" << d.first << " ok." << std::endl;
+      } 
+    }
+    std::cout << std::endl;
   }
 
   //TODO: Inform user of what happenned
@@ -220,8 +229,17 @@ int main(int argc, const char* argv[]) {
   } else if (argc >= 2) {
 
     if (std::string(argv[1]) == "sync") {
-      auto deps = inclusive::read_deps(inclusive::GLUE_PATH); 
-      for (auto& d : deps) { inclusive::check_and_clone(d.second); }
+      auto deps = inclusive::read_deps(inclusive::GLUE_PATH);
+      
+      std::cout << "Fetching and glueing in your git repository direct dependencies:" << std::endl;
+      for (auto& d : deps) {
+        if (!d.second.transitive) {
+          inclusive::check_and_clone(d.second); 
+          std::cout << "\t" << d.first << " ok." << std::endl;
+        }
+      }
+      std::cout << std::endl;
+
       hikeup_deep_deps(deps);
     }
 
