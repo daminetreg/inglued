@@ -37,18 +37,6 @@ And the best, is that it doesn't use the cumbersome **submodules**, but the marv
 Users just need to include your library folder. The rest is done by you using `#inglued <>`.
 
 ## Adding a library in 2 steps
-[We only support header-only dependencies](doc/rationale/WHY_HEADER_ONLY.md), any other kind of libraries have to disappear.
-
-Taking the example of [your-lib](examples/your-lib): imagine you made a library and you want someone to use it.
-
-What is sad is that you used other libraries to build your one :
-
-  * [cpp-pre::type\_traits](https://github.com/cpp-pre/type_traits/) to analyze lambda signatures
-  * Another library, that say is [example-dependency](https://github.com/header-only/example-dependency)
-
-So as it's not dependency free, it would require you to ask your users to install dependencies first. But this is a real pain, it is the best way to make your users flee.
-
-So we've created `#inglued <>` to solve this. Just 2 steps : 
 
   1. Add a new file `deps/glue` : 
  
@@ -62,7 +50,21 @@ So we've created `#inglued <>` to solve this. Just 2 steps :
 
   2. Run `glue seal`, and :boom: you can tag your lib let user download it via [Github Releases](https://help.github.com/articles/creating-releases/).
 
+### Explanation
 ![glue seal command run](doc/glue-seal-example.gif)
+
+[We only support header-only dependencies](doc/rationale/WHY_HEADER_ONLY.md), any other kind of libraries have to disappear.
+
+Taking the example of [your-lib](examples/your-lib): imagine you made a library and you want someone to use it.
+
+What is sad is that you used other libraries to build your one :
+
+  * [cpp-pre::type\_traits](https://github.com/cpp-pre/type_traits/) to analyze lambda signatures
+  * Another library, that say is [example-dependency](https://github.com/header-only/example-dependency)
+
+So as it's not dependency free, it would require you to ask your users to install dependencies first. But this is a real pain, it is the best way to make your users flee.
+
+We've created `#inglued <>` to solve this. :wink:
 
 ## Why not just copying the Headers in my code ?
 
