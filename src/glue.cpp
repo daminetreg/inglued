@@ -222,13 +222,17 @@ int main(int argc, const char* argv[]) {
                  "\n"
                  "Actually the best way for your users to consume libraries : just clone / download\n"
                  "and all is in the package!\n"
+                 "\n"
                  "No git-submodule but good old git-subtree !\n"
+                  
+                 "Commands : \n"
+                 "\t glue seal : Put all dependencies listed in `deps/glue` in your git repository."
                  << std::endl;
 
 
   } else if (argc >= 2) {
 
-    if (std::string(argv[1]) == "sync") {
+    if (std::string(argv[1]) == "seal") {
       auto deps = inclusive::read_deps(inclusive::GLUE_PATH);
       
       std::cout << "Fetching and glueing in your git repository direct dependencies:" << std::endl;
