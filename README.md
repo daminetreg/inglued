@@ -39,7 +39,7 @@ Users just need to include your library folder. The rest is done by you using `#
 ## Adding a library in 2 steps
 [We only support header-only dependencies](doc/rationale/WHY_HEADER_ONLY.md), any other kind of libraries have to disappear.
 
-Taking the example of [your-lib](examples/your-lib), you made a library, and now you want someone else to use it. 
+Taking the example of [your-lib](examples/your-lib): imagine you made a library and you want someone to use it.
 
 What is sad is that you used other libraries to build your one :
 
@@ -61,6 +61,8 @@ So we've created `#inglued <>` to solve this. Just 2 steps :
 
 
   2. Run `glue seal`, and :boom: you can tag your lib let user download it via [Github Releases](https://help.github.com/articles/creating-releases/).
+
+![glue seal command run](doc/glue-seal-example.gif)
 
 ## Why not just copying the Headers in my code ?
 
