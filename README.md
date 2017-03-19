@@ -12,49 +12,69 @@ Your library will be consumed by two different kind of users :
   - The app developer that just copy/paste your code in his project
   - The system builder which wants clean sysroot and good transitive CMake package dependency.
 
-# We make the app developer and the system packager happy 
-Here is a solution to provide your library easily to your users, **without needing** neither you nor your users to install **yet another tool**.
+## Yet another dependency-manager ? NO!
+Definitely not, this is only glue to ease the shipping of your header-only library. The goal of this tool is to be **hidden to library users**, only library authors see it.
 
-With **One single line more** your library will be available :
+It automates and ease the version upgrade of your dependencies, but application code author shouldn't bother, they will just reuse.
 
-  - Direct Integration of transitive dependencies by copy/paste in user project
-  - Integration via installation in sysroot setup of include paths, 
+## Yet another dependency store ?
+No, we give you access to any [github.com](https://github.com/) which is the largest dependency store out there. But you can giveu us any git clone url as well.
+
+# We make the app developer and the system packager happy
+Here is a solution to provide your library easily to your users, **without needing** your users to install **yet another tool**.
+
+  - **Either** directly by copy/paste in user project
+  - **Or** integration via installation in sysroot
+    * CMake Package Config for the CMake freaks
+    * CMake build files for the system packager.
+
 
 # How does it work ?
-It simply provides you with a way to package inside **your github repository** the dependencies you need. 
+It simply provides you with a way to package **dependencies** inside **your git repository**. 
 
-Users just need to include your folder. The rest is done by `#inclusive`.
+And the best, is that it doesn't use the cumbersome **submodules**, but the marvelous **subtree**.
 
-## Adding a library in 3 steps
-[We just support header-only dependencies](doc/rationale/WHY_HEADER_ONLY.md). Taking the example of [depending on Boost.Preprocessor](examples/simple) :
+Users just need to include your library folder. The rest is done by you using `#inglued <>`.
 
-  1. Add it as git subtree : `git subtree add --prefix examples/simple/include/somelib/inclusive/boost-preprocessor git@github.com:boostorg/preprocessor.git boost-1.62.0 --squash`
-  2. Copy/paste the header `inclusive.hpp` & add a `deps.hpp` to list your dependencies :
+## Adding a library in 2 steps
+[We only support header-only dependencies](doc/rationale/WHY_HEADER_ONLY.md), any other kind of libraries have to disappear.
 
-      ```cpp
-      #ifndef SOMELIB_INCLUSIVE_HPP
-      #define SOMELIB_INCLUSIVE_HPP
-        #define INCLUSIVE_boost_preprocessor inclusive/boost-preprocessor/include
-      #endif
-      ```
+Taking the example of [your-lib](examples/your-lib), you made a library, and now you want someone else to use it. 
 
-  3. In your code use the dependency as follows: 
+What is sad is that you used other libraries to build your one :
 
-      ```cpp
-      #include <inclusive>
-      #include INCLUSIVE(boost_preprocessor,boost/preprocessor/stringize.hpp)
-      ```
+  * [cpp-pre::type\_traits](https://github.com/cpp-pre/type_traits/) to analyze lambda signatures
+  * Another library, that say is [example-dependency](https://github.com/header-only/example-dependency)
 
-Finally you are done ! You can now compile any app using your library with : 
-  * `g++ -I/path/to/somelib yourprogram.cpp` : Shipped-with dependencies are used : it's all-inclusive. 
-  * `g++ -I/path/to/somelib yourprogram.cpp -DINCLUSIVE_DISABLED` : Dependencies are searched elsewhere ( *e.g.* /usr/include )
+So as it's not dependency free, it would require you to ask your users to install dependencies first. But this is a real pain, it is the best way to make your users flee.
+
+So we've created `#inglued <>` to solve this. Just 2 steps : 
+
+  1. Add a new file `deps/glue` : 
+ 
+```json
+{
+    "header-only/example-dependency"    : { "@" : "master" }
+  , "cpp-pre/type_traits"               : { "@" : "develop" }
+}
+```
+
+
+  2. Run `glue seal`, and :boom: you can tag your lib let user download it via [Github Releases](https://help.github.com/articles/creating-releases/).
 
 ## Why not just copying the Headers in my code ?
 
-  - You can either use git submodule / subtree to refer to your dependencies
-  - You can adapt to the folder hierarchy of the dependency in `deps.hpp`
-  - You can ship your library for users that just include your folder
-  - **BUT** you can as well provide a CMakeLists.txt which installs your headers in the user system/sysroot
-    * allowing your user to change the library version
-    * allowing your user to avoid having multiple copy of the library
-    * allowing your user depend on your CMake PackageConfig to get the correct compile flags.
+  - Via `#inglued <>` and it's the git-subtree you can easily bump version of your dependencies.
+  - You can adapt to the folder hierarchy of the dependency via glue
+  - Your users have the choice : 
+    * You can ship your library for users that just include your folder
+    * **OR** you can use the generated CMakeLists.txt to be a first-class citizen for system packager like yocto, ptxdist, debian...
+
+## License
+You don't bother as what this tool do will not have impact on your code, but in case : [Boost Software License](./LICENSE).
+
+Please give copyright notice for this project if you find it good.
+
+```
+Copyright (c) 2017 Damien Buhl alias daminetreg (damien.buhl@lecbna.org)
+```
