@@ -1,6 +1,6 @@
 ![#inglued <>](doc/logo.png)
 
-# `#inglued <>` : C++ dependencies made easy.
+# `#inglued <>` : erasing c++ dependencies.
 As a library author you have to ensure your library can be used easily. 
 
 The problem is that your users might get an hard time to consume your C++ library, if you do depend on some else library ! Dependency management is hard in C++ because there are :
