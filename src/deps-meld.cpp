@@ -6,6 +6,7 @@
 #include <boost/format.hpp>
 #include <nlohmann/json.hpp>
 #include <boost/algorithm/string.hpp>
+#include <future>
 #include <boost/process.hpp>
 #include <boost/filesystem.hpp>
 
@@ -115,6 +116,12 @@ namespace inclusive {
     };
 
     auto transitive_path = (path + ".transitive");
+    auto commit_transitive_manifest = [&transitive_path]() {
+      bp::system(bp::shell, "git", "add", transitive_path);
+      bp::system(bp::shell, "git", "commit", transitive_path, 
+        "-m", "\"#glued : transitive dependencies manifest.\"");
+    };
+
     { // Transitive dependencies
 
       nlohmann::json j;
@@ -127,16 +134,11 @@ namespace inclusive {
       if (j.size() > 0) {
         std::fstream ofs(transitive_path.data(), std::ios::in | std::ios::out | std::ios::trunc );
         ofs << j.dump(2);
+        ofs.close();
+        commit_transitive_manifest();
       }
     }
 
-    auto commit_transitive_manifest = [&transitive_path]() {
-      bp::system(bp::shell, "git", "add", transitive_path);
-      bp::system(bp::shell, "git", "commit", transitive_path, 
-        "-m", "\"#glued : transitive dependencies manifest.\"");
-    };
-
-    commit_transitive_manifest();
 
   }
 
@@ -144,14 +146,25 @@ namespace inclusive {
   //! Run git to install the dep if not already present
   inline void check_and_clone(const dep& d) {
 
-    auto returncode = bp::system(bp::shell, "git", "subtree", 
-      (fs::exists(fs::path("deps") / d.get_name()) ? "pull" : "add"),
-      "--prefix", std::string("deps/") + d.get_name(),
-      d.get_uri(), d.ref,
-      "--squash");
+    std::future<std::string> buffer;
 
-    if (returncode != 0) {
-      throw std::runtime_error("Cannot add the dependency, your working tree must not have changes to already commited files.");
+    boost::asio::io_service ios;
+    bp::child c(bp::search_path("git"), std::string("subtree")
+      , (fs::exists(fs::path("deps") / d.get_name()) ? "pull" : "add")
+      , std::string("--prefix=") + "deps/" + d.get_name()
+      , d.get_uri()
+      , d.ref
+      , "--squash"
+      , ios
+      , (bp::std_out & bp::std_err) > buffer);
+
+    ios.run();
+    c.wait();
+
+    if (c.exit_code() != 0) {
+      throw std::runtime_error(
+        std::string("Cannot add the dependency, your working tree must not have "
+        "changes to already commited files. Output is : \n ") + buffer.get());
     }
   }
 
