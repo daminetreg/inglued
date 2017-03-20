@@ -68,8 +68,8 @@ namespace inclusive {
       d.git_uri = it.key();
       d.ref = it.value()["@"].get<std::string>();
       
-      if (!it.value()["?"].is_null()) {
-        d.include_path = it.value()["?"].get<std::string>();
+      if (!it.value()["-I"].is_null()) {
+        d.include_path = it.value()["-I"].get<std::string>();
       }
 
       return d;
