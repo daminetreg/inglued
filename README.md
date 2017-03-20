@@ -3,7 +3,9 @@
 # `#inglued <>` : erasing c++ dependencies.
 As a library author you have to ensure your library can be used easily. 
 
-The problem is that your users might get an hard time to consume your C++ library, if you do depend on some else library ! Dependency management is hard in C++ because there are :
+The problem is that your users might get an hard time to consume your C++ library, if you do depend on some other library yourself.
+
+Dependency management is hard in C++ because there are :
   - so much target platform
   - so much build systems (cmake, visual studio, scons, autotools, bjam, waf, gyp,...)
   - so much kind of users
