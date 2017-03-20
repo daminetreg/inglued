@@ -57,7 +57,7 @@ Users just need to include your library folder. The rest is done by you using `#
 
 [We only support header-only dependencies](doc/rationale/WHY_HEADER_ONLY.md), any other kind of libraries have to disappear.
 
-Taking the example of [your-lib](examples/your-lib): imagine you made a library and you want someone to use it.
+Taking the example of [your-lib](https://github.com/header-only/example-your-lib): imagine you made a library and you want someone to use it.
 
 What is sad is that you used other libraries to build your one :
 
