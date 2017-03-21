@@ -44,17 +44,12 @@ endif()
 # Define header only library
 add_library({{project}} INTERFACE)
 
+set(include_install_dir "include")
+
 if (INGLUED)
 
-#  set_target_properties({{project}}
-#    PROPERTIES
-#    INTERFACE_COMPILE_OPTIONS "{{project_compile_opts}}")
-
-  target_include_directories({{project}}
-    INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>
-              {{#deps}}
-              $<INSTALL_INTERFACE:deps/{{name}}/{{include_path}}>
-              {{/deps}}
+  target_include_directories({{project}} INTERFACE 
+    $<INSTALL_INTERFACE:${include_install_dir}/{{project_srcs}}/deps> # Transitive libraries
   )
 
 
@@ -84,7 +79,6 @@ add_custom_target(sources SOURCES ${HPP_FILES})
 #   * <prefix>/lib/
 #   * <prefix>/include/
 set(config_install_dir "lib/cmake/${PROJECT_NAME}")
-set(include_install_dir "include")
 
 set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
 
@@ -137,21 +131,19 @@ install(
 
 install(
     DIRECTORY deps/<%name%>/<%include_path_end_backslash%>
-    DESTINATION ${include_install_dir}
+    DESTINATION ${include_install_dir}/<%project_srcs%>/deps
     FILES_MATCHING PATTERN "*.[ih]*"
-    PATTERN deps/<%name%>/deps EXCLUDE
+    PATTERN deps/<%name%>/deps EXCLUDE # Transitive deps are hikedup on `glue seal`.
     )
 
-#file (GLOB_RECURSE <%name%>_HPP_FILES deps/<%name%>/<%include_path%>/*)
-#install(FILES ${<%name%>_HPP_FILES} DESTINATION ${include_install_dir}/)
 <%/deps%>
 
 <%={{ }}=%>
 
 # Config
-#   * <prefix>/lib/cmake/Foo/FooConfig.cmake
-#   * <prefix>/lib/cmake/Foo/FooConfigVersion.cmake
-#   * <prefix>/lib/cmake/Foo/FooTargets.cmake
+#   * <prefix>/lib/cmake/{{project}}/{{project}}Config.cmake
+#   * <prefix>/lib/cmake/{{project}}/{{project}}ConfigVersion.cmake
+#   * <prefix>/lib/cmake/{{project}}/{{project}}Targets.cmake
 install(
     FILES "${project_config}" "${version_config}"
     DESTINATION "${config_install_dir}"
@@ -162,7 +154,15 @@ install(
     DESTINATION "${config_install_dir}"
 )
 
-  )";
+)";
+
+
+  constexpr auto cmakelist_package_config_tpl = R"(
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/@targets_export_name@.cmake")
+check_required_components("@PROJECT_NAME@")
+)";
 
 }
 
