@@ -12,9 +12,14 @@ find_package(Threads REQUIRED)
 find_package(Boost 1.61 COMPONENTS system filesystem)
 include_directories (AFTER ${Boost_INCLUDE_DIRS})
 
+
 # Shippedwith
+add_subdirectory(deps/mstch)
+include_directories(${mstch_INCLUDE_DIR})
+
 include_directories(AFTER ${CMAKE_CURRENT_LIST_DIR}/deps/boost-process/include)
 include_directories(AFTER ${CMAKE_CURRENT_LIST_DIR}/deps/nlohmann-json/)
 
+include_directories(BEFORE ${CMAKE_CURRENT_LIST_DIR}/src)
 add_executable(glue src/glue.cpp)
-target_link_libraries(glue ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(glue ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} mstch)

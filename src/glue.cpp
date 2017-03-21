@@ -12,8 +12,11 @@
 
 #include <boost/process/system.hpp>
 
+#include <mstch/mstch.hpp>
 
-namespace inclusive {
+#include <inglued/cmakelist_tpl.hpp>
+
+namespace inglued {
 
   using fmt = boost::format;
   namespace bp = boost::process;
@@ -59,9 +62,11 @@ namespace inclusive {
 
   };
 
+  using map_deps_t = std::map<std::string, dep>;
+
   //! Reads the list of deps in the from the given  file, and if it exits it's accompanying .transitive.
-  inline std::map<std::string, dep> read_deps(const std::string& path) {
-    std::map<std::string, dep> deps;
+  inline map_deps_t read_deps(const std::string& path) {
+    map_deps_t deps;
     
     auto to_dep = [](nlohmann::json::iterator& it) {
       dep d;
@@ -102,8 +107,8 @@ namespace inclusive {
     return deps;
   }
 
-  //! Reads the list of deps in the deps.inclusive json file.
-  inline void write_transitive_deps(const std::string& path, const std::map<std::string, dep>& deps) {
+  //! Reads the list of deps in the deps.inglued json file.
+  inline void write_transitive_deps(const std::string& path, const map_deps_t& deps) {
     auto to_json = [](auto d) {
       nlohmann::json dep_j;
       dep_j["@"] = d.second.ref;
@@ -169,7 +174,7 @@ namespace inclusive {
   }
 
   //! Delves in each dependencies at 1 depth level and lookup for further includesive deps. If some pull them up here.
-  inline void hikeup_deep_deps(std::map<std::string, dep>& deps) {
+  inline void hikeup_deep_deps(map_deps_t& deps) {
 
     for (auto& d : deps) {
       auto tape = fs::path("deps") / d.second.get_name() / GLUE_PATH;
@@ -194,16 +199,51 @@ namespace inclusive {
     // We have to duplicate the files because windows-git-clone symlinks impossible. Sad.
     for (auto& d : deps) {
       if (d.second.transitive) {
-        inclusive::check_and_clone(d.second); 
+        inglued::check_and_clone(d.second); 
         std::cout << "\t" << d.first << " ok." << std::endl;
       } 
     }
     std::cout << std::endl;
   }
 
-  //TODO: Inform user of what happenned
+ 
   //TODO: Generate CMakeLists.txt to include the stuffs
+  inline void generate_cmakelists(const std::string& project, map_deps_t& deps) {
+    using boost::algorithm::ends_with;
+
+    std::string view{cmakelist_tpl};
+
+    mstch::config::escape = [](const std::string& str) -> std::string { return str; };
+
+    mstch::array mstch_deps;
+    for (auto d : deps) {
+      mstch_deps.push_back(
+        mstch::map{
+          {"name", d.second.get_name()},
+          {"ref", d.second.ref},
+          {"include_path", d.second.include_path},
+          {"include_path_end_backslash", ((d.second.include_path.empty()) ? 
+              "" 
+            : ((ends_with(d.second.include_path, "/")) ? d.second.include_path : (d.second.include_path + "/")) 
+            )
+          }
+        }
+      );
+    }
+
+
+    mstch::map context{
+      {"project", project},
+      {"project_srcs", project},
+      {"deps", mstch_deps}
+    };
+    
+    std::cout << mstch::render(view, context) << std::endl;
+  }
+
+  //TODO: Inform user of what happenned : present him a tree and it's git changes. Tell him how to revert : glue unseal ?
   //TODO: Generate CONSUME.md with all compilers include path generated to explain how to use.
+  
 
 }
 
@@ -230,21 +270,27 @@ int main(int argc, const char* argv[]) {
                  << std::endl;
 
 
-  } else if (argc >= 2) {
+  } else if (argc > 2) {
 
-    if (std::string(argv[1]) == "seal") {
-      auto deps = inclusive::read_deps(inclusive::GLUE_PATH);
+    std::string cmd{argv[1]};
+
+    if (cmd == "seal") {
+      auto deps = inglued::read_deps(inglued::GLUE_PATH);
       
       std::cout << "Fetching and glueing in your git repository direct dependencies:" << std::endl;
       for (auto& d : deps) {
         if (!d.second.transitive) {
-          inclusive::check_and_clone(d.second); 
+          inglued::check_and_clone(d.second); 
           std::cout << "\t" << d.first << " ok." << std::endl;
         }
       }
       std::cout << std::endl;
 
       hikeup_deep_deps(deps);
+
+    } else if (cmd == "cmake") {
+      auto deps = inglued::read_deps(inglued::GLUE_PATH);
+      inglued::generate_cmakelists(argv[2], deps);
     }
 
   }
