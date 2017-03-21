@@ -9,12 +9,11 @@
 #include <future>
 #include <boost/process.hpp>
 #include <boost/filesystem.hpp>
-
 #include <boost/process/system.hpp>
 
-#include <mstch/mstch.hpp>
+#include <inglued/dep.hpp>
+#include <inglued/generate_cmakelists.hpp>
 
-#include <inglued/cmakelist_tpl.hpp>
 
 namespace inglued {
 
@@ -22,47 +21,6 @@ namespace inglued {
   namespace bp = boost::process;
   namespace fs = boost::filesystem;
 
-  constexpr auto GLUE_PATH = "deps/glue";
-
-  struct dep {
-    //! The github path or a git clone uri.
-    std::string git_uri;
-
-    //! Git tag or commit ref.
-    std::string ref;
-
-    //! The subrepository path to add to include path.
-    std::string include_path;
-
-    //! True when dependency is needed because of another dependency project.
-    bool transitive{};
-
-    //! \return The gihub clone URI if simple-single-slash path otherwise git_uri as-is.
-    std::string get_uri() const {
-      std::regex github_path("[^/]+/[^/]+");
- 
-      if (std::regex_match(git_uri, github_path)) {
-        return std::string("https://github.com/") + git_uri + ".git";
-      } else {
-        return git_uri;
-      }
-    }
-
-    std::string get_name() const {
-      std::regex only_name("[^/]+/([^/]+)(\\.git)?");
-      std::smatch matched;
-      std::regex_match(git_uri, matched, only_name);
-      
-      if (matched.size() < 2) {
-        throw std::runtime_error(str(fmt("Error \"%1%\" is an invalid repository URI or github-path !") % git_uri));
-      }
-
-      return matched[1];
-    }
-
-  };
-
-  using map_deps_t = std::map<std::string, dep>;
 
   //! Reads the list of deps in the from the given  file, and if it exits it's accompanying .transitive.
   inline map_deps_t read_deps(const std::string& path) {
@@ -207,39 +165,7 @@ namespace inglued {
   }
 
  
-  //TODO: Generate CMakeLists.txt to include the stuffs
-  inline void generate_cmakelists(const std::string& project, map_deps_t& deps) {
-    using boost::algorithm::ends_with;
 
-    std::string view{cmakelist_tpl};
-
-    mstch::config::escape = [](const std::string& str) -> std::string { return str; };
-
-    mstch::array mstch_deps;
-    for (auto d : deps) {
-      mstch_deps.push_back(
-        mstch::map{
-          {"name", d.second.get_name()},
-          {"ref", d.second.ref},
-          {"include_path", d.second.include_path},
-          {"include_path_end_backslash", ((d.second.include_path.empty()) ? 
-              "" 
-            : ((ends_with(d.second.include_path, "/")) ? d.second.include_path : (d.second.include_path + "/")) 
-            )
-          }
-        }
-      );
-    }
-
-
-    mstch::map context{
-      {"project", project},
-      {"project_srcs", project},
-      {"deps", mstch_deps}
-    };
-    
-    std::cout << mstch::render(view, context) << std::endl;
-  }
 
   //TODO: Inform user of what happenned : present him a tree and it's git changes. Tell him how to revert : glue unseal ?
   //TODO: Generate CONSUME.md with all compilers include path generated to explain how to use.
@@ -291,6 +217,8 @@ int main(int argc, const char* argv[]) {
     } else if (cmd == "cmake") {
       auto deps = inglued::read_deps(inglued::GLUE_PATH);
       inglued::generate_cmakelists(argv[2], deps);
+    } else if (cmd == "cmaketpl") {
+      inglued::generate_cmakelists_tpl();
     }
 
   }
