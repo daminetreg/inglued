@@ -35,8 +35,9 @@ namespace inglued {
 
         std::ifstream ifs{tpl_path};
         ifs.exceptions(std::ios::badbit);
-        ifs.seekg(std::ios::end);
-        view.reserve(ifs.tellg());
+        ifs.seekg(0, std::ios::end);
+        view.resize(ifs.tellg());
+        ifs.seekg(0);
         ifs.read(const_cast<char*>(view.data()), view.size());
       }
     };
