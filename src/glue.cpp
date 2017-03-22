@@ -129,6 +129,7 @@ namespace inglued {
         std::string("Cannot add the dependency, your working tree must not have "
         "changes to already commited files. Output is : \n ") + buffer.get());
     }
+
   }
 
   //! Delves in each dependencies at 1 depth level and lookup for further includesive deps. If some pull them up here.
@@ -178,10 +179,11 @@ namespace inglued {
 int main(int argc, const char* argv[]) {
   
   using boost::algorithm::ends_with;
+  using boost::algorithm::starts_with;
 
   std::string cmd{(argc > 1) ? argv[1] : "help"};
   if ( (argc <= 1) || ( (argc > 1) && (ends_with(cmd,"help")) ) ) {
-    std::cout << "#glued : The header-only dependency manager for library authors.\n";
+    std::cout << "#inglued <> : The header-only dependency manager for library authors.\n";
     std::cout << "\n";
 
     std::cout << "Simply make a deps/glue file listing your header-only github dependencies, \n"
@@ -205,6 +207,11 @@ int main(int argc, const char* argv[]) {
       if (!d.second.transitive) {
         inglued::check_and_clone(d.second); 
         std::cout << "\t" << d.first << " ok." << std::endl;
+      }
+
+      // XXX: Not the right place : recursivity of deps is broken, because the detected deps should be recursivley adapted !
+      if ( starts_with(d.second.git_uri, "boostorg/") ) {
+        auto to_check_and_clone_and_analyze = inglued::adapter::boostorg(d.second);
       }
     }
     std::cout << std::endl;

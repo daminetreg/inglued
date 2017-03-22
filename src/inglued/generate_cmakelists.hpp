@@ -8,6 +8,7 @@
 
 #include <inglued/dep.hpp>
 #include <inglued/cmakelist_tpl.hpp>
+#include <inglued/adapter/boostorg.hpp>
 
 namespace inglued {
 
@@ -126,6 +127,7 @@ auto constexpr inline_help = R"(
             * So how can we include them for the moment ? Anything in boostorg/ can be #inglued
             * with the official Boost find_package. But do we want this ?
   */
+
     
   //TODO: Generation of simple test folder for the lib.
 
