@@ -92,16 +92,40 @@ namespace inglued {
   //! Generate tpl file for the cmake freaks !
   void generate_cmakelists_tpl() {
 
-    std::cout << "😁 CMake expert : generating templates that you can edit !"
-// TODO: Add help about the variable avaible and their meaning.
+    std::cout << "😁 CMake expert : generating templates that you can edit in "
+      << CMAKELISTS_TPL_PATH << " and " << CMAKE_PACKAGE_CONFIG_PATH
       << std::endl;
 
     std::fstream cmakelists{CMAKELISTS_TPL_PATH, std::ios::trunc | std::ios::in | std::ios::out };
-    cmakelists << cmakelist_tpl;
+auto constexpr inline_help = R"(
+# This is an #inglued <> template !
+#
+# The template is processed by http://mustache.github.io/, more info about
+# syntax here : http://mustache.github.io/mustache.5.html 
+#
+# You can access the following variables : 
+# * {{project}} : current project name
+# * {{project_srcs}} : current project srcs folder.
+#
+# * {{#deps}} {{/deps}} : all deps, direct and transitive 
+#   - {{name}}
+#   - {{ref}} : tag or branch wished for the dep
+#   - {{include_path}} : the path you specified in deps/glue -I
+#   - {{include_path_end_backslash}} : same as above but with a guaranteed end slash.
+#
+)";
+
+    cmakelists << inline_help << cmakelist_tpl;
 
     std::fstream pkgconfig{CMAKE_PACKAGE_CONFIG_TPL_PATH, std::ios::trunc | std::ios::in | std::ios::out };
     pkgconfig << cmakelist_package_config_tpl;
   }
+  
+  /*TODO: Handle the mapping of inglued libraries and their system find_package counterparts.
+            * Meaning not all libraries are inglued today (which is sad)
+            * So how can we include them for the moment ? Anything in boostorg/ can be #inglued
+            * with the official Boost find_package. But do we want this ?
+  */
     
   //TODO: Generation of simple test folder for the lib.
 
