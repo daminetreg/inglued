@@ -179,7 +179,8 @@ int main(int argc, const char* argv[]) {
   
   using boost::algorithm::ends_with;
 
-  if ( (argc <= 1) || ( (argc > 1) && (ends_with(argv[1],"help")) ) ) {
+  std::string cmd{(argc > 1) ? argv[1] : "help"};
+  if ( (argc <= 1) || ( (argc > 1) && (ends_with(cmd,"help")) ) ) {
     std::cout << "#glued : The header-only dependency manager for library authors.\n";
     std::cout << "\n";
 
@@ -196,31 +197,25 @@ int main(int argc, const char* argv[]) {
                  << std::endl;
 
 
-  } else if (argc > 2) {
-
-    std::string cmd{argv[1]};
-
-    if (cmd == "seal") {
-      auto deps = inglued::read_deps(inglued::GLUE_PATH);
-      
-      std::cout << "Fetching and glueing in your git repository direct dependencies:" << std::endl;
-      for (auto& d : deps) {
-        if (!d.second.transitive) {
-          inglued::check_and_clone(d.second); 
-          std::cout << "\t" << d.first << " ok." << std::endl;
-        }
+  } else if ( cmd == "seal" ) {
+    auto deps = inglued::read_deps(inglued::GLUE_PATH);
+    
+    std::cout << "Fetching and glueing in your git repository direct dependencies:" << std::endl;
+    for (auto& d : deps) {
+      if (!d.second.transitive) {
+        inglued::check_and_clone(d.second); 
+        std::cout << "\t" << d.first << " ok." << std::endl;
       }
-      std::cout << std::endl;
-
-      hikeup_deep_deps(deps);
-
-    } else if (cmd == "cmake") {
-      auto deps = inglued::read_deps(inglued::GLUE_PATH);
-      inglued::generate_cmakelists(argv[2], deps);
-    } else if (cmd == "cmaketpl") {
-      inglued::generate_cmakelists_tpl();
     }
+    std::cout << std::endl;
 
+    hikeup_deep_deps(deps);
+
+  } else if ( (argc > 2) && (cmd == "cmake") ) {
+    auto deps = inglued::read_deps(inglued::GLUE_PATH);
+    inglued::generate_cmakelists(argv[2], deps);
+  } else if (cmd == "cmaketpl") {
+    inglued::generate_cmakelists_tpl();
   }
 
   return 0;
