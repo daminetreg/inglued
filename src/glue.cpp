@@ -210,9 +210,8 @@ int main(int argc, const char* argv[]) {
       }
 
       // XXX: Not the right place : recursivity of deps is broken, because the detected deps should be recursivley adapted !
-      if ( starts_with(d.second.git_uri, "boostorg/") ) {
-        auto to_check_and_clone_and_analyze = inglued::adapter::boostorg(d.second);
-      }
+      auto to_check_and_clone_and_analyze = inglued::adapter::boostorg(d.second);
+      deps.insert(to_check_and_clone_and_analyze.begin(), to_check_and_clone_and_analyze.end());
     }
     std::cout << std::endl;
 
