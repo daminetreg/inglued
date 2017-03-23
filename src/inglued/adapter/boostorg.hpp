@@ -1,6 +1,7 @@
 #ifndef INGLUED_ADAPTER_BOOSTORG_HPP
 #define INGLUED_ADAPTER_BOOSTORG_HPP
 
+#include <array>
 #include <string>
 #include <fstream>
 #include <regex>
@@ -33,6 +34,131 @@ namespace inglued { namespace adapter {
 
 /*TODO: Handle the generation of dependencies for libraries which are not #inglued. */
 // To find deps of fusion in boost: find . -type f | while read line; do cat $line | grep -P 'boost/[^(fusion)]'; done | sed 's;.*<boost/([^/]+).*;\1;' -r | sort | uniq
+
+  constexpr auto BOOST_LIBRARIES = {
+    "accumulators",
+    "algorithm",
+    "align",
+    "any",
+    "array",
+    "asio",
+    "assert",
+    "assign",
+    "atomic",
+    "bimap",
+    "bind",
+    "chrono",
+    "circular_buffer",
+    "compatibility",
+    "compute",
+    "concept_check",
+    "config",
+    "container",
+    "context",
+    "conversion",
+    "convert",
+    "core",
+    "coroutine",
+    "coroutine2",
+    "crc",
+    "date_time",
+    "detail",
+    "disjoint_sets",
+    "dll",
+    "dynamic_bitset",
+    "endian",
+    "exception",
+    "fiber",
+    "filesystem",
+    "flyweight",
+    "foreach",
+    "format",
+    "function",
+    "function_types",
+    "functional",
+    "fusion",
+    "geometry",
+    "gil",
+    "graph",
+    "graph_parallel",
+    "hana",
+    "heap",
+    "icl",
+    "integer",
+    "interprocess",
+    "intrusive",
+    "io",
+    "iostreams",
+    "iterator",
+    "lambda",
+    "lexical_cast",
+    "local_function",
+    "locale",
+    "lockfree",
+    "log",
+    "logic",
+    "math",
+    "metaparse",
+    "move",
+    "mpi",
+    "mpl",
+    "msm",
+    "multi_array",
+    "multi_index",
+    "multiprecision",
+    "numeric",
+    "optional",
+    "parameter",
+    "phoenix",
+    "polygon",
+    "pool",
+    "predef",
+    "preprocessor",
+    "program_options",
+    "property_map",
+    "property_tree",
+    "proto",
+    "ptr_container",
+    "python",
+    "qvm",
+    "random",
+    "range",
+    "ratio",
+    "rational",
+    "regex",
+    "scope_exit",
+    "serialization",
+    "signals",
+    "signals2",
+    "smart_ptr",
+    "sort",
+    "spirit",
+    "statechart",
+    "static_assert",
+    "system",
+    "test",
+    "thread",
+    "throw_exception",
+    "timer",
+    "tokenizer",
+    "tr1",
+    "tti",
+    "tuple",
+    "type_erasure",
+    "type_index",
+    "type_traits",
+    "typeof",
+    "units",
+    "unordered",
+    "utility",
+    "uuid",
+    "variant",
+    "vmd",
+    "wave",
+    "winapi",
+    "xpressive"
+  }; 
+
 
   //! \brief Adapts any boostorg/ inclusion as an #inglued dep, by finding out the dependencies of it.
   //! \return The deps needed by this boostorg library.
@@ -84,13 +210,25 @@ namespace inglued { namespace adapter {
               boost_deps[d.git_uri] = d;
             } else if (std::regex_search(match_str, matched, core_or_compound)) {
               std::cout << "core_or_compound:: dependency on " << matched[1] << '\n';
-              //TODO: Here a web query has to be made to check if it's a core component or some compound header from a boost library.
-              dep d {
-                std::string("boostorg/") + matched[1].str(),
-                "master",
-                "include/",
-                true
-              };
+              //TODO: Here a web query has to be made to check if it's a core component or some compound header from a boost library, but for the moment xxhr::GET needs inglued and therefore we hack the current boost library list. 
+              auto found = std::find(BOOST_LIBRARIES.begin(), BOOST_LIBRARIES.end(), matched[1].str());
+              dep d;
+              if (found != BOOST_LIBRARIES.end()) { // is a boost lib
+                d = dep {
+                  std::string("boostorg/") + matched[1].str(),
+                  "master",
+                  "include/",
+                  true
+                };
+              } else {
+                d = dep {
+                  "boostorg/core",
+                  "master",
+                  "include/",
+                  true
+                };
+              }
+
               boost_deps[d.git_uri] = d;
             }
 

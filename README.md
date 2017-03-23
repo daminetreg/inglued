@@ -76,6 +76,9 @@ We've created `#inglued <>` to solve this. :wink:
     * You can ship your library for users that just include your folder
     * **OR** you can use the generated CMakeLists.txt to be a first-class citizen for system packager like yocto, ptxdist, debian...
 
+## For more information on future development
+See our [ROADMAP](./ROADMAP.md)
+
 ## License
 You don't bother as what this tool do will not have impact on your code, but in case : [Boost Software License](./LICENSE).
 
