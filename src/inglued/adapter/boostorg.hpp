@@ -172,7 +172,7 @@ namespace inglued { namespace adapter {
     for (fs::directory_entry& entry : fs::recursive_directory_iterator{includes_to_scan}) {
 
       if ( fs::is_regular_file(entry.path()) ) {
-        std::cout << "scanning " << entry.path().native() << std::endl; 
+        //std::cout << "scanning " << entry.path().native() << std::endl; 
         std::ifstream ifs(entry.path().native().data());
         ifs.exceptions(std::ios::badbit);
         std::string header;

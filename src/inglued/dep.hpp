@@ -38,15 +38,18 @@ namespace inglued {
     }
 
     std::string get_name() const {
-      std::regex only_name("[^/]+/([^/]+)(\\.git)?");
+      //TODO: Add support for full git URIs.
+      std::regex only_name("((([^/]+)/)|([^/]+))+"); //(\\.git)?");
       std::smatch matched;
       std::regex_match(git_uri, matched, only_name);
-      
-      if (matched.size() < 2) {
-        throw std::runtime_error(str(fmt("Error \"%1%\" is an invalid repository URI or github-path !") % git_uri));
+
+      if (matched.size() < 3) {
+        throw std::runtime_error(str(fmt("Error \"%1%\" is an invalid github-path !") % git_uri));
       }
 
-      return matched[1];
+      return std::string(matched[matched.size() - 2]) 
+        + "/" + std::string(matched[matched.size() - 1]);
+
     }
 
   };
