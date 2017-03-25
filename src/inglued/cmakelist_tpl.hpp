@@ -4,7 +4,7 @@
 namespace inglued {
 
   constexpr auto cmakelist_tpl = R"(
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.5.2)
 
 project({{project}} VERSION "0.0.1")
 enable_testing()
@@ -30,16 +30,16 @@ if ("${COMPILER_IN_USE}" STREQUAL "GNU" OR "${COMPILER_IN_USE}" MATCHES "CLANG")
 endif()
 
 
+
 {{#deps}}
 # {{name}}
 if (INGLUED)
-  include_directories(AFTER deps/{{name}}/{{include_path}})
-else()
-  find_package({{name}} {{ref}} REQUIRED)
+  include_directories(AFTER deps/{{org}}/{{name}}/{{include_path}})
+else ()
+  find_package({{cmake_package_name}} REQUIRED)
 endif()
 
 {{/deps}}
-
 
 # Define header only library
 add_library({{project}} INTERFACE)
@@ -49,7 +49,8 @@ set(include_install_dir "include")
 if (INGLUED)
 
   target_include_directories({{project}} INTERFACE 
-    $<INSTALL_INTERFACE:${include_install_dir}/{{project_srcs}}/deps> # Transitive libraries
+    # Transitive libraries location once installed
+    $<INSTALL_INTERFACE:${include_install_dir}/{{project_srcs}}/deps> 
   )
 
 
@@ -57,7 +58,7 @@ else()
 
   target_link_libraries({{project}} INTERFACE 
     {{#deps}}
-      {{name}}::{{name}}
+      {{cmake_target_name}}
     {{/deps}}
   )
 
@@ -125,20 +126,23 @@ install(
     FILES_MATCHING PATTERN "*.[ih]*"
 )
 
-{{=<% %>=}}
+# Install the deps when run in INGLUED mode
+if (INGLUED)
+  {{=<% %>=}}
 
-<%#deps%>
+  <%#deps%>
 
-install(
-    DIRECTORY deps/<%name%>/<%include_path_end_backslash%>
-    DESTINATION ${include_install_dir}/<%project_srcs%>/deps
-    FILES_MATCHING PATTERN "*.[ih]*"
-    PATTERN deps/<%name%>/deps EXCLUDE # Transitive deps are hikedup on `glue seal`.
-    )
+  install(
+      DIRECTORY deps/<%org%>/<%name%>/<%include_path_end_backslash%>
+      DESTINATION ${include_install_dir}/<%project_srcs%>/deps
+      FILES_MATCHING PATTERN "*.[ih]*"
+      PATTERN deps/<%org%>/<%name%>/deps EXCLUDE # Transitive deps are hikedup on `glue seal`.
+      )
 
-<%/deps%>
+  <%/deps%>
 
-<%={{ }}=%>
+  <%={{ }}=%>
+endif(INGLUED)
 
 # Config
 #   * <prefix>/lib/cmake/{{project}}/{{project}}Config.cmake

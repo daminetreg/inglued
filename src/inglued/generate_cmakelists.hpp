@@ -3,6 +3,7 @@
 
 #include <string>
 #include <fstream>
+#include <regex>
 #include <mstch/mstch.hpp>
 #include <boost/filesystem.hpp>
 
@@ -19,6 +20,17 @@ namespace inglued {
   
   constexpr auto CMAKELISTS_PATH = "CMakeLists.txt";
   constexpr auto CMAKE_PACKAGE_CONFIG_PATH = "cmake/modules/Config.cmake.in";
+
+  struct cmake_info {
+    std::string package;
+    std::string target;
+  };
+
+  //TODO: Make this cmake mapping loadable from a file to allow adapting to sysroot installed packages
+  const std::map<std::string, cmake_info> cmake_package_map {
+    {"boostorg/.*", {"Boost", "Boost::boost"}},
+    {"nlohmann/json", {"nlohmann_json", "nlohmann_json"} }
+  };
 
   //! Generates CMakeLists.txt to make the project usable by cmake projects
   inline void generate_cmakelists(const std::string& project, map_deps_t& deps) {
@@ -51,9 +63,26 @@ namespace inglued {
 
       mstch::array mstch_deps;
       for (auto d : deps) {
+
+        auto cmake_package_name = d.second.get_gh_organization();
+        auto cmake_target_name = d.second.get_gh_organization() + "::" + d.second.get_gh_name();
+
+        // Check if library has a cmake package mapping where general rule doesn't fit anymore
+        for (const auto& mapping : cmake_package_map) {
+          std::regex rx{mapping.first};
+          if (std::regex_match(d.second.git_uri, rx)) {
+            cmake_package_name = mapping.second.package;
+            cmake_target_name = mapping.second.target;
+            break;
+          }
+        }
+
         mstch_deps.push_back(
           mstch::map{
-            {"name", d.second.get_name()},
+            {"cmake_package_name", cmake_package_name},
+            {"cmake_target_name", cmake_target_name},
+            {"org", d.second.get_gh_organization()},
+            {"name", d.second.get_gh_name()},
             {"ref", d.second.ref},
             {"include_path", d.second.include_path},
             {"include_path_end_backslash", ((d.second.include_path.empty()) ? 
@@ -108,8 +137,11 @@ auto constexpr inline_help = R"(
 # * {{project}} : current project name
 # * {{project_srcs}} : current project srcs folder.
 #
-# * {{#deps}} {{/deps}} : all deps, direct and transitive 
-#   - {{name}}
+# * {{#deps}} {{/deps}} : all deps direct and transitive 
+#   - {{cmake_package_name}} : The cmake package name from the cmake_package_map otherwise: {{org}}
+#   - {{cmake_target_name}} : The cmake target name from cmake_package_map otherwise: {{cmake_package_name}}::{{name}}
+#   - {{org}} : the github organization name
+#   - {{name}} : the dependency repository name
 #   - {{ref}} : tag or branch wished for the dep
 #   - {{include_path}} : the path you specified in deps/glue -I
 #   - {{include_path_end_backslash}} : same as above but with a guaranteed end slash.

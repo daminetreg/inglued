@@ -52,6 +52,24 @@ namespace inglued {
 
     }
 
+    std::string get_gh_organization() const {
+      //TODO: Add support for full git URIs.
+      std::regex only_name("([^/]+)/[^/]+");
+      std::smatch matched;
+      std::regex_match(git_uri, matched, only_name);
+
+      return matched[1];
+    }
+
+    std::string get_gh_name() const {
+      //TODO: Add support for full git URIs.
+      std::regex only_name("[^/]+/([^/]+)");
+      std::smatch matched;
+      std::regex_match(git_uri, matched, only_name);
+
+      return matched[1];
+    }
+
   };
 
   using map_deps_t = std::map<std::string, dep>;
