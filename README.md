@@ -40,7 +40,7 @@ Users just need to include your library folder. The rest is done by you using `#
 
 ## Adding a library in 2 steps
 
-  1. Add a new file `deps/glue` : 
+  1. Add a new file `deps/inglued` : 
  
 ```json
 {
@@ -50,7 +50,7 @@ Users just need to include your library folder. The rest is done by you using `#
 ```
 
 
-  2. Run `glue seal`, and :boom: you can tag your lib let user download it via [Github Releases](https://help.github.com/articles/creating-releases/).
+  2. Run `inglued seal`, and :boom: you can tag your lib let user download it via [Github Releases](https://help.github.com/articles/creating-releases/).
 
 ### Explanation
 ![glue seal command run](doc/glue-seal-example.gif)
