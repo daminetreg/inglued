@@ -11,6 +11,9 @@
 
 /* header-only/adapter.git : 
  
+ To find deps of fusion in boost: find . -type f | while read line; do cat $line | grep -P 'boost/[^(fusion)]'; done | sed 's;.*<boost/([^/]+).*;\1;' -r | sort | uniq
+ This is a rule definition format id to genericize this code, helped by github-search api.
+   
  {
     "boostorg/[^(boost)]+" : {
       "non-inglued" : "find_package(Boost VERSION ...);",
@@ -29,11 +32,6 @@
 namespace inglued { namespace adapter {
 
   namespace fs = boost::filesystem;
-
-  //TODO: Acutally can be used for any boostorg dependency on any lib or glue deps.
-
-/*TODO: Handle the generation of dependencies for libraries which are not #inglued. */
-// To find deps of fusion in boost: find . -type f | while read line; do cat $line | grep -P 'boost/[^(fusion)]'; done | sed 's;.*<boost/([^/]+).*;\1;' -r | sort | uniq
 
   constexpr auto BOOST_LIBRARIES = {
     "accumulators",
@@ -160,10 +158,12 @@ namespace inglued { namespace adapter {
   }; 
 
 
-  //! \brief Adapts any boostorg/ inclusion as an #inglued dep, by finding out the dependencies of it.
+  //! \brief Detects any boost/ inclusion and add it as an #inglued dep, by finding out the dependencies of it.
   //! \return The deps needed by this boostorg library.
   inline map_deps_t boostorg(const dep& d) {
     auto includes_to_scan = fs::path{"deps"} / d.get_name() / d.include_path;
+
+    std::cout << "########### SCAN OF " << d.get_name() << std::endl; 
 
     map_deps_t boost_deps{};
 
@@ -172,6 +172,7 @@ namespace inglued { namespace adapter {
     for (fs::directory_entry& entry : fs::recursive_directory_iterator{includes_to_scan}) {
 
       if ( fs::is_regular_file(entry.path()) ) {
+        std::cout << "scanning " << entry.path().native() << std::endl; 
         std::ifstream ifs(entry.path().native().data());
         ifs.exceptions(std::ios::badbit);
         std::string header;
@@ -180,48 +181,49 @@ namespace inglued { namespace adapter {
         ifs.seekg(0, std::ios::beg);
         ifs.read(const_cast<char*>(header.data()), header.size());
 
-        std::cout << "File size : " << header.size() << std::endl;
+        //std::cout << "File size : " << header.size() << std::endl;
 
         std::regex include_directive("# *include[^<\"]*(<|\")boost/([^>\"]+)(>|\")");
         auto includes_begin = 
             std::sregex_iterator(header.begin(), header.end(), include_directive);
         auto includes_end = std::sregex_iterator();
      
-        std::cout << "Found "
-                  << std::distance(includes_begin, includes_end)
-                  << " includes.\n";
+       // std::cout << "Found "
+       //           << std::distance(includes_begin, includes_end)
+       //           << " includes.\n";
      
         for (std::sregex_iterator it = includes_begin; it != includes_end; ++it) {
             std::smatch match = *it;
             std::string match_str = match.str();
-            std::cout << "  " << match_str << '\n';
+            //std::cout << "  " << match_str << '\n';
 
             std::regex other_lib("boost/([^/]+)/.*");
             std::regex core_or_compound("boost/([^\\.]+)\\.");
             std::smatch matched;
             if (std::regex_search(match_str, matched, other_lib)) {
-              std::cout << " dependency on " << matched[1] << '\n';
-              dep d {
+              //// std::cout << " dependency on " << matched[1] << '\n';
+              dep detected_d {
                 std::string("boostorg/") + matched[1].str(),
                 "master",
                 "include/",
                 true
               };
-              boost_deps[d.git_uri] = d;
+              boost_deps[detected_d.git_uri] = detected_d;
+
             } else if (std::regex_search(match_str, matched, core_or_compound)) {
-              std::cout << "core_or_compound:: dependency on " << matched[1] << '\n';
+              //// std::cout << "core_or_compound:: dependency on " << matched[1] << '\n';
               //TODO: Here a web query has to be made to check if it's a core component or some compound header from a boost library, but for the moment xxhr::GET needs inglued and therefore we hack the current boost library list. 
               auto found = std::find(BOOST_LIBRARIES.begin(), BOOST_LIBRARIES.end(), matched[1].str());
-              dep d;
+              dep detected_d;
               if (found != BOOST_LIBRARIES.end()) { // is a boost lib
-                d = dep {
+                 detected_d = dep {
                   std::string("boostorg/") + matched[1].str(),
                   "master",
                   "include/",
                   true
                 };
               } else {
-                d = dep {
+                detected_d = dep {
                   "boostorg/core",
                   "master",
                   "include/",
@@ -229,18 +231,13 @@ namespace inglued { namespace adapter {
                 };
               }
 
-              boost_deps[d.git_uri] = d;
+              boost_deps[detected_d.git_uri] = detected_d;
             }
 
 
         }
   
   
-  //      std::regex only_name("[^/]+/([^/]+)(\\.git)?");
-  //      std::smatch matched;
-  //      std::regex_match(git_uri, matched, only_name);
-    
-
       }
 
     }

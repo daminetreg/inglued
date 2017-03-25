@@ -2,7 +2,9 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <vector>
 #include <regex>
+#include <boost/range/algorithm/find.hpp>
 #include <boost/format.hpp>
 #include <nlohmann/json.hpp>
 #include <boost/algorithm/string.hpp>
@@ -135,16 +137,48 @@ namespace inglued {
   //! Delves in each dependencies at 1 depth level and lookup for further includesive deps. If some pull them up here.
   inline void hikeup_deep_deps(map_deps_t& deps) {
 
+    auto scan_inglued_dep = [](const fs::path& glue_file) {
+      auto deep_deps = read_deps(glue_file.native());
+
+      std::for_each(deep_deps.begin(), deep_deps.end(),
+        [](auto& p) { p.second.transitive  = true;});
+
+      return deep_deps;
+    };
+
+    //TODO: Deal with #inglued lib which is used by non-inglued one.
+    std::vector<std::string> already_scanned;
+    auto scan_non_inglued_dep = [&](dep d, const auto& self) -> map_deps_t {
+      using boost::range::find;
+      map_deps_t deep_deps;
+
+      if (find(already_scanned, d.git_uri) == already_scanned.end()) { 
+        deep_deps = inglued::adapter::boostorg(d);
+        already_scanned.push_back(d.git_uri);
+
+        for (auto deep_d : deep_deps) {
+          inglued::check_and_clone(deep_d.second); 
+
+          auto deeper_deps = self(deep_d.second, self);
+          deep_deps.insert(deeper_deps.begin(), deeper_deps.end());
+        }
+
+      }
+        
+        return deep_deps;
+    };
+
     for (auto& d : deps) {
-      auto tape = fs::path("deps") / d.second.get_name() / GLUE_PATH;
-      if (fs::exists(tape)) {
-        auto deep_deps = read_deps(tape.native());
 
-        // For us they are all transitive
-        std::for_each(deep_deps.begin(), deep_deps.end(),
-          [](auto& p) { p.second.transitive  = true;});
-
+      auto glue_file = fs::path("deps") / d.second.get_name() / GLUE_PATH;
+      if (fs::exists(glue_file)) {
+        auto deep_deps = scan_inglued_dep(glue_file);
         deps.insert(deep_deps.begin(), deep_deps.end());
+
+      } else {
+        auto deep_deps = scan_non_inglued_dep(d.second, scan_non_inglued_dep);
+        deps.insert(deep_deps.begin(), deep_deps.end());
+
       }
     }
 
@@ -208,10 +242,6 @@ int main(int argc, const char* argv[]) {
         inglued::check_and_clone(d.second); 
         std::cout << "\t" << d.first << " ok." << std::endl;
       }
-
-      // XXX: Not the right place : recursivity of deps is broken, because the detected deps should be recursivley adapted !
-      auto to_check_and_clone_and_analyze = inglued::adapter::boostorg(d.second);
-      deps.insert(to_check_and_clone_and_analyze.begin(), to_check_and_clone_and_analyze.end());
     }
     std::cout << std::endl;
 
