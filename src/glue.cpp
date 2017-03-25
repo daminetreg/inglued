@@ -208,7 +208,24 @@ namespace inglued {
 
 }
 
-  
+inline void show_help() {
+  std::cout << "#inglued <> : The header-only dependency manager for library authors.\n";
+  std::cout << "\n";
+
+  std::cout << "Simply make a deps/glue file listing your header-only github dependencies, \n"
+               "and glue will commit them to your repository !\n"
+               "\n"
+               "Actually the best way for your users to consume libraries : just clone / download\n"
+               "and all is in the package!\n"
+               "\n"
+               "No git-submodule but good old git-subtree !\n"
+                
+               "Commands : \n"
+               "\t glue seal : Put all dependencies listed in `deps/glue` in your git repository.\n"
+               "\t glue cmake <org> <project> <project_srcs> : Generate a CMakeLists.txt to let your library be cmake find_packaged and more\n"
+               "\t glue cmaketpl : Create a CMakeLists.txt.tpl that you can tweak if you need custom additions\n"
+               << std::endl;
+}
 
 int main(int argc, const char* argv[]) {
   
@@ -217,23 +234,7 @@ int main(int argc, const char* argv[]) {
 
   std::string cmd{(argc > 1) ? argv[1] : "help"};
   if ( (argc <= 1) || ( (argc > 1) && (ends_with(cmd,"help")) ) ) {
-    std::cout << "#inglued <> : The header-only dependency manager for library authors.\n";
-    std::cout << "\n";
-
-    std::cout << "Simply make a deps/glue file listing your header-only github dependencies, \n"
-                 "and glue will commit them to your repository !\n"
-                 "\n"
-                 "Actually the best way for your users to consume libraries : just clone / download\n"
-                 "and all is in the package!\n"
-                 "\n"
-                 "No git-submodule but good old git-subtree !\n"
-                  
-                 "Commands : \n"
-                 "\t glue seal : Put all dependencies listed in `deps/glue` in your git repository.\n"
-                 "\t glue cmake <project_srcs> : Generate a CMakeLists.txt to let your library be cmake find_packaged and more\n"
-                 "\t glue cmaketpl : Create a CMakeLists.txt.tpl that you can tweak if you need custom additions\n"
-                 << std::endl;
-
+    show_help();
 
   } else if ( cmd == "seal" ) {
     auto deps = inglued::read_deps(inglued::GLUE_PATH);
@@ -249,11 +250,17 @@ int main(int argc, const char* argv[]) {
 
     hikeup_deep_deps(deps);
 
-  } else if ( (argc > 2) && (cmd == "cmake") ) {
+  } else if ( (argc > 4) && (cmd == "cmake") ) {
     auto deps = inglued::read_deps(inglued::GLUE_PATH);
-    inglued::generate_cmakelists(argv[2], deps);
+    inglued::generate_cmakelists(argv[2], argv[3], argv[4], deps);
+
+  } else if ( (argc < 4) && (cmd == "cmake") ) {
+    show_help();
+    std::cout << "Not enough arguments to cmake command !" << std::endl;
+  
   } else if (cmd == "cmaketpl") {
     inglued::generate_cmakelists_tpl();
+
   }
 
   return 0;

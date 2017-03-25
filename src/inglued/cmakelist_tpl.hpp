@@ -42,7 +42,9 @@ endif()
 {{/deps}}
 
 # Define header only library
+include_directories(BEFORE ${CMAKE_CURRENT_LIST_DIR})
 add_library({{project}} INTERFACE)
+add_library({{org}}::{{project}} ALIAS {{project}})
 
 set(include_install_dir "include")
 

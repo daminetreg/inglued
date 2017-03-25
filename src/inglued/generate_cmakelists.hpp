@@ -33,7 +33,7 @@ namespace inglued {
   };
 
   //! Generates CMakeLists.txt to make the project usable by cmake projects
-  inline void generate_cmakelists(const std::string& project, map_deps_t& deps) {
+  inline void generate_cmakelists(const std::string& org, const std::string& project, const std::string& project_srcs, map_deps_t& deps) {
     using boost::algorithm::ends_with;
 
     std::string cmakelist_view{cmakelist_tpl};
@@ -95,8 +95,9 @@ namespace inglued {
       }
 
       mstch::map context{
+        {"org", org},
         {"project", project},
-        {"project_srcs", project},
+        {"project_srcs", project_srcs},
         {"deps", mstch_deps}
       };
       
@@ -142,6 +143,7 @@ auto constexpr inline_help = R"(
 # syntax here : http://mustache.github.io/mustache.5.html 
 #
 # You can access the following variables : 
+# * {{org}} : github organization name
 # * {{project}} : current project name
 # * {{project_srcs}} : current project srcs folder.
 #
