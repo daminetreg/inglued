@@ -204,7 +204,7 @@ namespace inglued { namespace adapter {
               //// std::cout << " dependency on " << matched[1] << '\n';
               dep detected_d {
                 std::string("boostorg/") + matched[1].str(),
-                "master",
+                d.ref,
                 "include/",
                 true
               };
@@ -218,14 +218,14 @@ namespace inglued { namespace adapter {
               if (found != BOOST_LIBRARIES.end()) { // is a boost lib
                  detected_d = dep {
                   std::string("boostorg/") + matched[1].str(),
-                  "master",
+                  d.ref,
                   "include/",
                   true
                 };
               } else {
                 detected_d = dep {
                   "boostorg/core",
-                  "master",
+                  d.ref,
                   "include/",
                   true
                 };
