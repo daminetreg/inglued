@@ -104,6 +104,14 @@ namespace inglued {
 
       std::fstream cmakelists{path, std::ios::trunc | std::ios::in | std::ios::out };
       cmakelists.exceptions(std::ios::badbit);
+
+auto constexpr cmakelist_header= R"(
+# This is an #inglued <> generated CMakeLists.txt (https://github.com/header-only/inglued)
+# To modify it edit CMakeLists.txt.tpl ( i.e. Generate it with `inglued cmaketpl` )
+
+)";
+
+      cmakelists << cmakelist_header;
       cmakelists << mstch::render(cmakelist_view, context);
     };
 
