@@ -221,9 +221,9 @@ inline void show_help() {
                "No git-submodule but good old git-subtree !\n"
                 
                "Commands : \n"
-               "\t glue seal : Put all dependencies listed in `deps/glue` in your git repository.\n"
-               "\t glue cmake <org> <project> <project_srcs> : Generate a CMakeLists.txt to let your library be cmake find_packaged and more\n"
-               "\t glue cmaketpl : Create a CMakeLists.txt.tpl that you can tweak if you need custom additions\n"
+               "\t inglued seal : Put all dependencies listed in `deps/glue` in your git repository.\n"
+               "\t inglued cmake <org> <project> <project_srcs> : Generate a CMakeLists.txt to let your library be cmake find_packaged and more\n"
+               "\t inglued cmaketpl : Create a CMakeLists.txt.tpl that you can tweak if you need custom additions\n"
                << std::endl;
 }
 

@@ -21,5 +21,5 @@ include_directories(AFTER ${CMAKE_CURRENT_LIST_DIR}/deps/boost-process/include)
 include_directories(AFTER ${CMAKE_CURRENT_LIST_DIR}/deps/nlohmann-json/)
 
 include_directories(BEFORE ${CMAKE_CURRENT_LIST_DIR}/src)
-add_executable(glue src/glue.cpp)
-target_link_libraries(glue ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} mstch)
+add_executable(inglued src/inglued.cpp)
+target_link_libraries(inglued ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} mstch)
