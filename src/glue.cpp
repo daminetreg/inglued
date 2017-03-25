@@ -229,7 +229,9 @@ int main(int argc, const char* argv[]) {
                  "No git-submodule but good old git-subtree !\n"
                   
                  "Commands : \n"
-                 "\t glue seal : Put all dependencies listed in `deps/glue` in your git repository."
+                 "\t glue seal : Put all dependencies listed in `deps/glue` in your git repository.\n"
+                 "\t glue cmake <project_srcs> : Generate a CMakeLists.txt to let your library be cmake find_packaged and more\n"
+                 "\t glue cmaketpl : Create a CMakeLists.txt.tpl that you can tweak if you need custom additions\n"
                  << std::endl;
 
 
