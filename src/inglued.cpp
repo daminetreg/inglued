@@ -84,7 +84,7 @@ namespace inglued {
     auto commit_transitive_manifest = [&transitive_path]() {
       bp::system(bp::shell, "git", "add", transitive_path);
       bp::system(bp::shell, "git", "commit", transitive_path, 
-        "-m", "\"#glued : transitive dependencies manifest.\"");
+        "-m", "\"#inglued : transitive dependencies manifest.\"");
     };
 
     { // Transitive dependencies
@@ -111,6 +111,8 @@ namespace inglued {
   //! Run git to install the dep if not already present
   inline void check_and_clone(const dep& d) {
 
+    std::cout << "\t fetching " << d.git_uri << "..." << std::flush;
+
     std::future<std::string> buffer;
 
     boost::asio::io_service ios;
@@ -132,6 +134,8 @@ namespace inglued {
         "changes to already commited files. Output is : \n ") + buffer.get());
     }
 
+    std::cout << " ok." << std::endl;
+
   }
 
   //! Delves in each dependencies at 1 depth level and lookup for further includesive deps. If some pull them up here.
@@ -148,7 +152,7 @@ namespace inglued {
 
     //TODO: Deal with #inglued lib which is used by non-inglued one.
     std::vector<std::string> already_scanned;
-    auto scan_non_inglued_dep = [&](dep d, const auto& self) -> map_deps_t {
+    auto scan_non_inglued_dep = [&already_scanned](dep d, const auto& self) -> map_deps_t {
       using boost::range::find;
       map_deps_t deep_deps;
 
@@ -157,7 +161,10 @@ namespace inglued {
         already_scanned.push_back(d.git_uri);
 
         for (auto deep_d : deep_deps) {
-          inglued::check_and_clone(deep_d.second); 
+
+          if (find(already_scanned, deep_d.second.git_uri) == already_scanned.end()) { 
+            inglued::check_and_clone(deep_d.second); 
+          }
 
           auto deeper_deps = self(deep_d.second, self);
           deep_deps.insert(deeper_deps.begin(), deeper_deps.end());
@@ -167,6 +174,8 @@ namespace inglued {
         
         return deep_deps;
     };
+
+
 
     for (auto& d : deps) {
 
@@ -182,20 +191,16 @@ namespace inglued {
       }
     }
 
-    // Write down the transitive deps
-    std::cout << "Declaring the transitive dependencies." << std::endl;
-    write_transitive_deps(GLUE_PATH, deps);
-    std::cout << std::endl;
-
     std::cout << "Fetching and glueing in your git repository transitive dependencies:" << std::endl;
     // Now that we have hiked up the deps of our deps, clone and add them again at our level.
     // We have to duplicate the files because windows-git-clone symlinks impossible. Sad.
     for (auto& d : deps) {
-      if (d.second.transitive) {
-        inglued::check_and_clone(d.second); 
-        std::cout << "\t" << d.first << " ok." << std::endl;
-      } 
+      if (d.second.transitive) { inglued::check_and_clone(d.second); } 
     }
+
+    // Write down the transitive deps
+    std::cout << "Declaring the transitive dependencies in " << GLUE_PATH << ".transitive" << std::endl;
+    write_transitive_deps(GLUE_PATH, deps);
     std::cout << std::endl;
   }
 
@@ -212,8 +217,8 @@ inline void show_help() {
   std::cout << "#inglued <> : The header-only dependency manager for library authors.\n";
   std::cout << "\n";
 
-  std::cout << "Simply make a deps/glue file listing your header-only github dependencies, \n"
-               "and glue will commit them to your repository !\n"
+  std::cout << "Simply make a deps/inglued file listing your header-only github dependencies, \n"
+               "and inglued will commit them to your repository !\n"
                "\n"
                "Actually the best way for your users to consume libraries : just clone / download\n"
                "and all is in the package!\n"
@@ -221,7 +226,7 @@ inline void show_help() {
                "No git-submodule but good old git-subtree !\n"
                 
                "Commands : \n"
-               "\t inglued seal : Put all dependencies listed in `deps/glue` in your git repository.\n"
+               "\t inglued seal : Put all dependencies listed in `deps/inglued` in your git repository.\n"
                "\t inglued cmake <org> <project> <project_srcs> : Generate a CMakeLists.txt to let your library be cmake find_packaged and more\n"
                "\t inglued cmaketpl : Create a CMakeLists.txt.tpl that you can tweak if you need custom additions\n"
                << std::endl;
@@ -241,13 +246,11 @@ int main(int argc, const char* argv[]) {
     
     std::cout << "Fetching and glueing in your git repository direct dependencies:" << std::endl;
     for (auto& d : deps) {
-      if (!d.second.transitive) {
-        inglued::check_and_clone(d.second); 
-        std::cout << "\t" << d.first << " ok." << std::endl;
-      }
+      if (!d.second.transitive) { inglued::check_and_clone(d.second); }
     }
     std::cout << std::endl;
 
+    std::cout << "Fetching and glueing in your git repository transitive dependencies:" << std::endl;
     hikeup_deep_deps(deps);
 
   } else if ( (argc > 4) && (cmd == "cmake") ) {

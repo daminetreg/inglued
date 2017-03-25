@@ -11,7 +11,7 @@ namespace inglued {
 
   using fmt = boost::format;
 
-  constexpr auto GLUE_PATH = "deps/glue";
+  constexpr auto GLUE_PATH = "deps/inglued";
 
   struct dep {
     //! The github path or a git clone uri.

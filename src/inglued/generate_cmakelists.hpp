@@ -153,7 +153,7 @@ auto constexpr inline_help = R"(
 #   - {{org}} : the github organization name
 #   - {{name}} : the dependency repository name
 #   - {{ref}} : tag or branch wished for the dep
-#   - {{include_path}} : the path you specified in deps/glue -I
+#   - {{include_path}} : the path you specified in deps/inglued -I
 #   - {{include_path_end_backslash}} : same as above but with a guaranteed end slash.
 #
 )";

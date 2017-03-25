@@ -163,7 +163,8 @@ namespace inglued { namespace adapter {
   inline map_deps_t boostorg(const dep& d) {
     auto includes_to_scan = fs::path{"deps"} / d.get_name() / d.include_path;
 
-    std::cout << "########### SCAN OF " << d.get_name() << std::endl; 
+    std::cout << "...\n"
+              << "scanning non-#inglued <> dependency : " << d.get_name() << "..." << std::flush;
 
     map_deps_t boost_deps{};
 
@@ -241,6 +242,8 @@ namespace inglued { namespace adapter {
       }
 
     }
+
+    std::cout << " ok." << std::endl;
 
     return boost_deps;
   }
