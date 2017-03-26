@@ -4,7 +4,7 @@
 namespace inglued {
 
   constexpr auto cmakelist_tpl = R"(
-cmake_minimum_required(VERSION 3.5.2)
+cmake_minimum_required(VERSION 3.7.2)
 
 project({{project}} VERSION "0.0.1")
 enable_testing()

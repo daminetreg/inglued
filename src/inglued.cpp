@@ -255,6 +255,8 @@ int main(int argc, const char* argv[]) {
 
   } else if ( (argc > 4) && (cmd == "cmake") ) {
     auto deps = inglued::read_deps(inglued::GLUE_PATH);
+    std::cout << "Generating CMakeLists.txt to allow IDE support, test to be build and sysroot installation." << std::endl;
+    //TODO: argv[2] and argv[3] could be taken from default origin remote if github.com
     inglued::generate_cmakelists(argv[2], argv[3], argv[4], deps);
 
   } else if ( (argc < 4) && (cmd == "cmake") ) {

@@ -1,26 +1,38 @@
 ![#inglued <>](doc/logo.png)
 
-# `#inglued <>` : erasing c++ dependencies.
-As a library author you have to ensure your library can be used easily. 
+# `#inglued <>` : hiding c++ dependencies.
+First [we only support header-only dependencies](doc/rationale/WHY_HEADER_ONLY.md), any other kind of libraries have to disappear.
+
+As a library author you want your library to be used easily. 
 
 The problem is that your users might get an hard time to consume your C++ library, if you do depend on some other library yourself.
 
 Dependency management is hard in C++ because there are :
   - so much target platform
-  - so much build systems (cmake, visual studio, scons, autotools, bjam, waf, gyp,...)
+  - so much build systems (cmake, visual studio, scons, autotools, bjam, waf, gyp, gn, bazelbuild, ninja...)
   - so much kind of users
 
 Your library will be consumed by two different kind of users :
   - The app developer that just copy/paste your code in his project
   - The system builder which wants clean sysroot and good transitive CMake package dependency.
 
-## Yet another dependency-manager ? NO!
-Definitely not, this is only glue to ease the shipping of your header-only library. The goal of this tool is to be **hidden to library users**, only library authors see it.
+## FEATURES
+  * No installation needed
+  * Relies on git
+  * Support non-`#inglued <>` deps as well by `#include` scanning
+  * Allows copy/paste of library in other project
+  * Generates CMake if wanted
+
+### Yet another dependency-manager ? NO!
+Definitely not, this is only glue to ease the shipping of your header-only library. The goal of this tool is to **hide dependencies to users that doesn't care**.
 
 It automates and ease the version upgrade of your dependencies, but application code author shouldn't bother, they will just reuse.
 
-## Yet another dependency store ?
+### Yet another dependency store ? NO!
 No, we give you access to any [github.com](https://github.com/) which is the largest dependency store out there. But you can giveu us any git clone url as well.
+
+### Yet another build system ? NO!
+`inglued cmake` and `inglued cmaketpl` allows you to generate a CMakeLists.txt so that you can use
 
 # We make the app developer and the system packager happy
 Here is a solution to provide your library easily to your users, **without needing** your users to install **yet another tool**.
@@ -29,7 +41,6 @@ Here is a solution to provide your library easily to your users, **without needi
   - **Or** integration via installation in sysroot
     * CMake Package Config for the CMake freaks
     * CMake build files for the system packager.
-
 
 # How does it work ?
 It simply provides you with a way to package **dependencies** inside **your git repository**. 
@@ -44,39 +55,39 @@ Users just need to include your library folder. The rest is done by you using `#
  
 ```json
 {
-    "header-only/example-dependency"    : { "@" : "master" }
-  , "cpp-pre/type_traits"               : { "@" : "develop" }
+    "nlohmann/json"                   : { "@" : "v2.1.1", "-I" : "src/" }
+  , "boostorg/preprocessor"           : { "@" : "boost-1.62.0", "-I" : "include/" }
+  , "boostorg/fusion"                 : { "@" : "boost-1.62.0", "-I" : "include/" }
 }
 ```
 
+  2. Run `inglued seal`, and :boom: you can tag your lib & let users download it via [Github Releases](https://help.github.com/articles/creating-releases/).
 
-  2. Run `inglued seal`, and :boom: you can tag your lib let user download it via [Github Releases](https://help.github.com/articles/creating-releases/).
 
-### Explanation
-![glue seal command run](doc/glue-seal-example.gif)
+### Example
+Library [example-dependency](https://github.com/header-only/example-dependency) depends on : 
 
-[We only support header-only dependencies](doc/rationale/WHY_HEADER_ONLY.md), any other kind of libraries have to disappear.
+  * [nlohmann/json](https://github.com/nlohmann/json)
+  * [Boost.Preprocessor](https://github.com/boostorg/preprocessor)
+  * [Boost.Fusion](https://github.com/boostorg/fusion)
 
-Taking the example of [your-lib](https://github.com/header-only/example-your-lib): imagine you made a library and you want someone to use it.
-
-What is sad is that you used other libraries to build your one :
-
-  * [cpp-pre::type\_traits](https://github.com/cpp-pre/type_traits/) to analyze lambda signatures
-  * Another library, that say is [example-dependency](https://github.com/header-only/example-dependency)
-
-So as it's not dependency free, it would require you to ask your users to install dependencies first. But this is a real pain, it is the best way to make your users flee.
+The users of **example-dependency** have to tediously install all these transitive dependencies and the other dependencies they also bring ? 
 
 We've created `#inglued <>` to solve this. :wink:
 
-## Why not just copying the Headers in my code ?
+#### inglued steps :
+  * [Dependencies ready in deps/inglued](https://github.com/header-only/example-dependency/tree/list-your-deps)
+  * `inglued seal` : [see diff](https://github.com/header-only/example-dependency/compare/list-your-deps...ran-inglued-seal)
+  * `inglued cmake header-only example-dependency example-dependency` : [see diff](https://github.com/header-only/example-dependency/compare/ran-inglued-seal...ran-inglued-cmake)
 
-  - Via `#inglued <>` and it's the git-subtree you can easily bump version of your dependencies.
-  - You can adapt to the folder hierarchy of the dependency via glue
-  - Your users have the choice : 
-    * You can ship your library for users that just include your folder
-    * **OR** you can use the generated CMakeLists.txt to be a first-class citizen for system packager like yocto, ptxdist, debian...
+![inglued seal command run](doc/glue-seal-example.gif)
 
-## For more information on future development
+#### Conclusion
+Thanks to these three commands we satisfy :
+  - the user who doesn't care and just want to code
+  - the user who want to integrate your lib in it's favourite build system.
+
+## Future Development ROADMAP
 See our [ROADMAP](./ROADMAP.md)
 
 ## License
