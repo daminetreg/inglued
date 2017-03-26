@@ -8,6 +8,7 @@
 #include <boost/filesystem.hpp>
 
 #include <inglued/dep.hpp>
+#include <inglued/tpl.hpp>
 #include <inglued/cmakelist_tpl.hpp>
 #include <inglued/adapter/boostorg.hpp>
 
@@ -39,26 +40,10 @@ namespace inglued {
     std::string cmakelist_view{cmakelist_tpl};
     std::string package_config_view{cmakelist_package_config_tpl};
 
-
-    auto use_template_if_exists = [](auto tpl_path, std::string& view) {
-      if (fs::exists(tpl_path)) {
-        std::cout << "😁 CMake expert : your " << tpl_path 
-          << " template is used, remove them if you want default."
-          << std::endl;
-
-        std::ifstream ifs{tpl_path};
-        ifs.exceptions(std::ios::badbit);
-        ifs.seekg(0, std::ios::end);
-        view.resize(ifs.tellg());
-        ifs.seekg(0);
-        ifs.read(const_cast<char*>(view.data()), view.size());
-      }
-    };
-
     use_template_if_exists(CMAKELISTS_TPL_PATH, cmakelist_view);
     use_template_if_exists(CMAKE_PACKAGE_CONFIG_TPL_PATH, package_config_view);
 
-    auto generate_cmakelists = [&](auto path) {
+    auto generate_cmakelists_txt = [&](auto path) {
       mstch::config::escape = [](const std::string& str) { return str; };
 
       mstch::array mstch_deps;
@@ -124,7 +109,7 @@ auto constexpr cmakelist_header= R"(
       pkgconfig << package_config_view;
     };
 
-    generate_cmakelists(CMAKELISTS_PATH);
+    generate_cmakelists_txt(CMAKELISTS_PATH);
     generate_package_config(CMAKE_PACKAGE_CONFIG_PATH);
   }
 

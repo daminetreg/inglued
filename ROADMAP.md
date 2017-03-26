@@ -7,7 +7,7 @@ Scope of this version is to support simple use cases for the xxhr and cpp.js nee
     - `#inglued <>` based compilation
     - `find_package()` system based compilation (hacked in with a mapping for boost for the moment)
     - Working simple test folder and default compilation unit generation 
-  - [ ] Working COMPILE.md documentation generation
+  - [x] Working INSTALL.md documentation generation
   - [x] Support for boost dependencies and for any `#inglued <>` library. 
   - [ ] Release for linux
   - [x] Documentation for easy installation and for use of cmake feature.

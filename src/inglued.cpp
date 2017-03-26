@@ -15,6 +15,7 @@
 
 #include <inglued/dep.hpp>
 #include <inglued/generate_cmakelists.hpp>
+#include <inglued/generate_install_doc.hpp>
 
 
 namespace inglued {
@@ -258,6 +259,7 @@ int main(int argc, const char* argv[]) {
     std::cout << "Generating CMakeLists.txt to allow IDE support, test to be build and sysroot installation." << std::endl;
     //TODO: argv[2] and argv[3] could be taken from default origin remote if github.com
     inglued::generate_cmakelists(argv[2], argv[3], argv[4], deps);
+    inglued::generate_install_doc(argv[2], argv[3], argv[4], deps);
 
   } else if ( (argc < 4) && (cmd == "cmake") ) {
     show_help();
