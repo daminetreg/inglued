@@ -55,7 +55,7 @@ SNIP
 
 This way a CMake user of your library can simply do :
 
-```
+```cmake
 find_package(example-dependency REQUIRED)
 add_executable(app app.cpp)
 target_link_libraries(app header-only::example-dependency)
@@ -68,10 +68,39 @@ When running CMake you can do : `cmake .. -DUNIT_TESTS=ON` which will allow you 
 
 You can in the directory `test/` or any other of your choice by using the `CMakeLists.txt.tpl` feature : `inglued cmaketpl` use your library include paths this way : 
 
-```
+```cmake
 add_executable(example_test example_test.cpp)
 target_link_libraries(example_test header-only::example-dependency)
 ```
 
-This forwards all `include_directories` you need to the compilation of example_test :
+This forwards all `include_directories` you need to the compilation of example_test : `make VERBOSE=1`
 
+
+```sh
+/usr/bin/c++ 
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/assert/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/config/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/core/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/detail/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/exception/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/function/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/function_types/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/functional/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/fusion/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/integer/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/move/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/mpl/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/predef/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/preprocessor/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/static_assert/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/throw_exception/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/tuple/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/type_index/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/type_traits/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/typeof/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/boostorg/utility/include
+  -I/home/daminetreg/workspace/cpp.js/inglued/example/example-dependency/deps/nlohmann/json/src  
+  -Wall -Werror -Wno-unused-local-typedefs -Wno-unused-variable -std=gnu++14 -o CMakeFiles/example_test.dir/example_test.cpp.o -c example-dependency/test/example_test.cpp
+```
