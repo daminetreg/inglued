@@ -228,7 +228,10 @@ inline void show_help() {
                 
                "Commands : \n"
                "\t inglued seal : Put all dependencies listed in `deps/inglued` in your git repository.\n"
-               "\t inglued cmake <org> <project> <project_srcs> : Generate a CMakeLists.txt to let your library be cmake find_packaged and more\n"
+               "\t inglued cmake <org> <project> <project_srcs> : Generates 2 stuffs.\n"
+               "\t\t - CMakeLists.txt to let your library be cmake find_packaged\n"
+               "\t\t - INSTALL.md to help your users\n"
+               "\n"
                "\t inglued cmaketpl : Create a CMakeLists.txt.tpl that you can tweak if you need custom additions\n"
                << std::endl;
 }

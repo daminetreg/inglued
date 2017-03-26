@@ -49,6 +49,8 @@ namespace inglued {
     std::fstream install_md{path.native().data(), std::ios::trunc | std::ios::in | std::ios::out };
     install_md.exceptions(std::ios::badbit);
     install_md << mstch::render(install_doc_view, context);
+
+    std::cout << "Generated " << INSTALL_DOC_PATH << std::endl;
   }
 }
 

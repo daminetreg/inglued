@@ -99,6 +99,8 @@ auto constexpr cmakelist_header= R"(
 
       cmakelists << cmakelist_header;
       cmakelists << mstch::render(cmakelist_view, context);
+
+      std::cout << "Generated " << path << std::endl;
     };
 
     auto generate_package_config = [&](auto path) {
@@ -107,6 +109,8 @@ auto constexpr cmakelist_header= R"(
       std::fstream pkgconfig{path, std::ios::trunc | std::ios::in | std::ios::out };
       pkgconfig.exceptions(std::ios::badbit);
       pkgconfig << package_config_view;
+
+      std::cout << "Generated " << path << std::endl;
     };
 
     generate_cmakelists_txt(CMAKELISTS_PATH);
