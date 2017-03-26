@@ -24,15 +24,16 @@ Your library will be consumed by two different kind of users :
   * Generates CMake if wanted
 
 ### Yet another dependency-manager ? NO!
-Definitely not, this is only glue to ease the shipping of your header-only library. The goal of this tool is to **hide dependencies to users that doesn't care**.
+Definitely not, this is only glue to ease the shipping of your header-only library. The goal of this tool is to **hide dependencies to users who doesn't care**.
 
 It automates and ease the version upgrade of your dependencies, but application code author shouldn't bother, they will just reuse.
 
 ### Yet another dependency store ? NO!
-No, we give you access to any [github.com](https://github.com/) which is the largest dependency store out there. But you can giveu us any git clone url as well.
+No, we give you access to any [github.com](https://github.com/) repo which is the largest dependency store out there.
 
 ### Yet another build system ? NO!
-`inglued cmake` and `inglued cmaketpl` allows you to generate a CMakeLists.txt so that you can use
+`inglued cmake` allows you to automagically generate a correct CMakeLists.txt for your lib but you don't have to.
+[Read more about CMAKE Support](doc/CMAKE_SUPPORT.md)
 
 # We make the app developer and the system packager happy
 Here is a solution to provide your library easily to your users, **without needing** your users to install **yet another tool**.
@@ -84,8 +85,14 @@ We've created `#inglued <>` to solve this. :wink:
 
 #### Conclusion
 Thanks to these three commands we satisfy :
-  - the user who doesn't care and just want to code
-  - the user who want to integrate your lib in it's favourite build system.
+  - the user who doesn't care and just want to code : 
+    * He `copy/paste` your lib in it's project
+
+  - the user who wants to integrate your lib in it's sysroot :
+    * He runs : `cmake . && make install`
+
+  - the user who wants to take it's own version of your dependencies 
+    * He runs : `cmake . -DINGLUED=OFF && make install`
 
 ## Future Development ROADMAP
 See our [ROADMAP](./ROADMAP.md)

@@ -10,7 +10,7 @@ Scope of this version is to support simple use cases for the xxhr and cpp.js nee
   - [ ] Working COMPILE.md documentation generation
   - [x] Support for boost dependencies and for any `#inglued <>` library. 
   - [ ] Release for linux
-  - [ ] Documentation for easy installation and for use of cmake feature.
+  - [x] Documentation for easy installation and for use of cmake feature.
 
 ## Version 2 - Somewhere in End of April : Making it usable for anyone
 
