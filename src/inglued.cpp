@@ -6,7 +6,7 @@
 #include <regex>
 #include <boost/range/algorithm/find.hpp>
 #include <boost/format.hpp>
-#include <nlohmann/json.hpp>
+#include <json.hpp>
 #include <boost/algorithm/string.hpp>
 #include <future>
 #include <boost/process.hpp>
