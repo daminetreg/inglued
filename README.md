@@ -109,4 +109,4 @@ Copyright (c) 2017 Damien Buhl alias daminetreg (damien.buhl@lecbna.org)
 ### Contributors
 Give them copyrights too !
 
-- Patrick Wieder (linkineo@linkineo.fr) : [linkineo](https://github.com/linkineo)
+- Patrick Wieder (linkineo@linkineo.com) : [linkineo](https://github.com/linkineo)
