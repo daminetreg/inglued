@@ -119,7 +119,7 @@ namespace inglued {
     boost::asio::io_service ios;
     bp::child c(bp::search_path("git"), std::string("subtree")
       , (fs::exists(fs::path("deps") / d.get_name()) ? "pull" : "add")
-      , std::string("--prefix=") + "deps/" + d.get_name()
+      , std::string("--prefix=") + "deps" + d.get_name()
       , d.get_uri()
       , d.ref
       , "--squash"
