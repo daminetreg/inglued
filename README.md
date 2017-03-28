@@ -105,3 +105,8 @@ Please give copyright notice for this project if you find it good.
 ```
 Copyright (c) 2017 Damien Buhl alias daminetreg (damien.buhl@lecbna.org)
 ```
+
+### Contributors
+Give them copyrights too !
+
+- Patrick Wieder (linkineo@linkineo.fr) : [linkineo](https://github.com/linkineo)
