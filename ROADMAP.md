@@ -9,8 +9,9 @@ Scope of this version is to support simple use cases for the xxhr and cpp.js nee
     - Working simple test folder and default compilation unit generation 
   - [x] Working INSTALL.md documentation generation
   - [x] Support for boost dependencies and for any `#inglued <>` library. 
-  - [ ] Release for linux
   - [x] Documentation for easy installation and for use of cmake feature.
+  - [ ] Release for linux
+  - [ ] Release for macOS
 
 ## Version 2 - Somewhere in End of April : Making it usable for anyone
 
@@ -21,4 +22,4 @@ Scope of this version is to support simple use cases for the xxhr and cpp.js nee
 
   - [ ] Improve command line with colors
 
-  - [ ] Release for all major platform
+  - [ ] Release for windows 
