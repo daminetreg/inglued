@@ -5,7 +5,8 @@
 #include <map>
 #include <regex>
 #include <boost/format.hpp>
-
+#include <vector>
+#include <boost/algorithm/string.hpp>
 
 namespace inglued {
 
@@ -38,17 +39,15 @@ namespace inglued {
     }
 
     std::string get_name() const {
-      //TODO: Add support for full git URIs.
-      std::regex only_name("((([^/]+)/)|([^/]+))+"); //(\\.git)?");
-      std::smatch matched;
-      std::regex_match(git_uri, matched, only_name);
 
-      if (matched.size() < 3) {
+      std::vector<std::string> tokens;
+      boost::split(tokens,git_uri,boost::is_any_of("/"));
+      if (tokens.size() < 2) {
         throw std::runtime_error(str(fmt("Error \"%1%\" is an invalid github-path !") % git_uri));
       }
 
-      return std::string(matched[matched.size() - 2]) 
-        + "/" + std::string(matched[matched.size() - 1]);
+      return std::string(tokens[0]) 
+        + "/" + std::string(tokens[1]);
 
     }
 
