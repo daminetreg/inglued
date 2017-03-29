@@ -42,7 +42,6 @@ namespace inglued {
 
       std::vector<std::string> tokens;
       boost::split(tokens,git_uri,boost::is_any_of("/"));
-      std::cout << "VEC=" << tokens.size()  << " 0" << tokens[0] << " 1" << tokens[1] << std::endl;
       if (tokens.size() < 2) {
         throw std::runtime_error(str(fmt("Error \"%1%\" is an invalid github-path !") % git_uri));
       }
