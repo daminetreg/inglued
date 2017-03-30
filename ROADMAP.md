@@ -20,6 +20,11 @@ Scope of this version is to support simple use cases for the xxhr and cpp.js nee
     - [ ] Transform it to a generic non glued library adapter.
     - [ ] Based on little mapping that users can add themselves in deps/glue.
 
+  - [ ] cmdline to search and add libraries (using the adapter to scan our own sources)
+
+  - [ ] Detect if not at the repository root
+  - [ ] Detect if deps/inglued not commited
   - [ ] Improve command line with colors
 
   - [ ] Release for windows 
+
