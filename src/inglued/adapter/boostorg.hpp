@@ -201,18 +201,9 @@ namespace inglued { namespace adapter {
             std::regex other_lib("boost/([^/]+)/.*");
             std::regex core_or_compound("boost/([^\\.]+)\\.");
             std::smatch matched;
-            if (std::regex_search(match_str, matched, other_lib)) {
-              //// std::cout << " dependency on " << matched[1] << '\n';
-              dep detected_d {
-                std::string("boostorg/") + matched[1].str(),
-                d.ref,
-                "include/",
-                true
-              };
-              boost_deps[detected_d.git_uri] = detected_d;
-
-            } else if (std::regex_search(match_str, matched, core_or_compound)) {
-              //// std::cout << "core_or_compound:: dependency on " << matched[1] << '\n';
+            if ( (std::regex_search(match_str, matched, other_lib)) 
+                  || (std::regex_search(match_str, matched, core_or_compound))
+             ){
               //TODO: Here a web query has to be made to check if it's a core component or some compound header from a boost library, but for the moment xxhr::GET needs inglued and therefore we hack the current boost library list. 
               auto found = std::find(BOOST_LIBRARIES.begin(), BOOST_LIBRARIES.end(), matched[1].str());
               dep detected_d;
