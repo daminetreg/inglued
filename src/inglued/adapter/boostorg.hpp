@@ -208,13 +208,20 @@ namespace inglued { namespace adapter {
               auto found = std::find(BOOST_LIBRARIES.begin(), BOOST_LIBRARIES.end(), matched[1].str());
               dep detected_d;
               if (found != BOOST_LIBRARIES.end()) { // is a boost lib
+
+                auto libtofetch = matched[1].str();
+                if (libtofetch == "numeric") {
+                  libtofetch = "numeric_conversion";
+                }
+
                  detected_d = dep {
-                  std::string("boostorg/") + matched[1].str(),
+                  std::string("boostorg/") + libtofetch,
                   d.ref,
                   "include/",
                   true
                 };
               } else {
+
                 detected_d = dep {
                   "boostorg/core",
                   d.ref,
