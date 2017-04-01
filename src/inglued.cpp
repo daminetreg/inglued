@@ -232,7 +232,11 @@ inline void show_help() {
                "\t\t - CMakeLists.txt to let your library be cmake find_packaged\n"
                "\t\t - INSTALL.md to help your users\n"
                "\n"
-               "\t inglued cmaketpl : Create a CMakeLists.txt.tpl that you can tweak if you need custom additions\n"
+               "\t inglued cmaketpl : Create templates with inline help that you can tweak\n"
+               "\t\t - CMakeLists.txt.tpl \n"
+               "\t\t - cmake/modules/Config.cmake.in.tpl \n"
+               "\t\t - INSTALL.md.tpl \n"
+               "\n"
                << std::endl;
 }
 
@@ -270,6 +274,7 @@ int main(int argc, const char* argv[]) {
   
   } else if (cmd == "cmaketpl") {
     inglued::generate_cmakelists_tpl();
+    inglued::generate_install_doc_tpl();
 
   }
 

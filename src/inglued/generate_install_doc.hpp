@@ -52,6 +52,20 @@ namespace inglued {
 
     std::cout << "Generated " << INSTALL_DOC_PATH << std::endl;
   }
+
+  //! Generate tpl file for the cmake freaks !
+  void generate_install_doc_tpl() {
+
+    std::cout << "😁 INSTALL.md expert : generating a template that you can edit in "
+      << INSTALL_DOC_TPL_PATH
+      << std::endl;
+
+    std::fstream install_doc{INSTALL_DOC_TPL_PATH, std::ios::trunc | std::ios::in | std::ios::out };
+
+    install_doc << install_doc_tpl;
+  }
+ 
+
 }
 
 
