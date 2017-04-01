@@ -7,7 +7,11 @@
     - [ ] Transform it to a generic non glued library adapter.
     - [ ] Based on little mapping that users can add themselves in deps/glue.
 
+  - [ ] Add possibility to put compiler options (check how to do it compiler agnostively ?)
+
   - [ ] cmdline to search and add libraries (using the adapter to scan our own sources)
+
+  - [ ] Add cmake generation for application developer (inglue the inglued project)
 
   - [ ] Detect if not at the repository root
   - [ ] Detect if deps/inglued not commited
