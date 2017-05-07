@@ -19,3 +19,11 @@
 
   - [ ] Release for windows 
 
+### Other evolutions
+
+  - [ ] Create an headeronlyfier which adds all .c/cpp files in an header.
+    - [ ] Scan sources of non-header-only library
+    - [ ] Package all the sources inside an header that can be inclued in the final app
+    - [ ] Make this header grow across all steps of transitive inclusion of deps.
+    - [ ] Add minification of this header.
+  - [ ] Create a modulizer : this big header can be used to generate C++ modules easily.
