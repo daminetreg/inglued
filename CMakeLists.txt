@@ -1,4 +1,11 @@
 cmake_minimum_required(VERSION 3.0.0)
+
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.18.65.tar.gz"
+    SHA1 "59cd3223f10ee630bc3596709a22f2fea4926a7c"
+)
+
 project (inclusive VERSION "0.0.1")
 
 #set (CMAKE_CXX_STANDARD 14)
@@ -20,11 +27,10 @@ endif()
 # Threads
 find_package(Threads REQUIRED)
 
-
 # Boost
-find_package(Boost 1.61 COMPONENTS system filesystem)
+hunter_add_package(Boost COMPONENTS system filesystem)
+find_package(Boost 1.64 COMPONENTS system filesystem)
 include_directories (AFTER ${Boost_INCLUDE_DIRS})
-
 
 # Shippedwith
 add_subdirectory(deps/mstch)
