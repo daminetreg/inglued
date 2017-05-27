@@ -114,25 +114,30 @@ namespace inglued {
 
     std::cout << "\t fetching " << d.git_uri << "..." << std::flush;
 
-    std::future<std::string> buffer;
+	auto gitti = bp::search_path("git");
+	
+	bp::child cc(gitti.generic_string(), std::string("status"));
+	cc.wait();
+
+    //std::future<std::string> buffer;
 
     boost::asio::io_service ios;
-    bp::child c(bp::search_path("git"), std::string("subtree")
+    bp::child c(gitti.generic_string(), std::string("subtree")
       , (fs::exists(fs::path("deps") / d.get_name()) ? "pull" : "add")
       , std::string("--prefix=") + "deps/" + d.get_name()
       , d.get_uri()
       , d.ref
       , "--squash"
-      , ios
-      , (bp::std_out & bp::std_err) > buffer);
+      /*, ios
+      , (bp::std_out & bp::std_err) > buffer*/);
 
-    ios.run();
+    //ios.run();
     c.wait();
 
     if (c.exit_code() != 0) {
       throw std::runtime_error(
         std::string("Cannot add the dependency, your working tree must not have "
-        "changes to already commited files. Output is : \n ") + buffer.get());
+        "changes to already commited files. Output is : \n ")/* + buffer.get()*/);
     }
 
     std::cout << " ok." << std::endl;
@@ -143,7 +148,7 @@ namespace inglued {
   inline void hikeup_deep_deps(map_deps_t& deps) {
 
     auto scan_inglued_dep = [](const fs::path& glue_file) {
-      auto deep_deps = read_deps(glue_file.native());
+      auto deep_deps = read_deps(glue_file.generic_string());
 
       std::for_each(deep_deps.begin(), deep_deps.end(),
         [](auto& p) { p.second.transitive  = true;});
