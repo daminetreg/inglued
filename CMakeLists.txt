@@ -28,6 +28,7 @@ endif()
 find_package(Threads REQUIRED)
 
 # Boost
+add_definitions(-DBOOST_ALL_NO_LIB)
 hunter_add_package(Boost COMPONENTS system filesystem)
 find_package(Boost 1.64 COMPONENTS system filesystem)
 include_directories (AFTER ${Boost_INCLUDE_DIRS})

@@ -33,7 +33,7 @@ namespace inglued { namespace adapter {
 
   namespace fs = boost::filesystem;
 
-  constexpr auto BOOST_LIBRARIES = {
+  const auto BOOST_LIBRARIES = {
     "accumulators",
     "algorithm",
     "align",
