@@ -2,6 +2,7 @@
 
 ## alpha floréal - version 2 - Somewhere in End of April : Making it usable for anyone
 
+  - [ ] for windows and all platform use a master try/catch to print the execution errors
   - [ ] Make the boost dependency adapter a generic non glued library adapter
     - [ ] Make it github.com connected to check out if a library exists or not. (looking for include path in search or for repo names in organizations).
     - [ ] Transform it to a generic non glued library adapter.
