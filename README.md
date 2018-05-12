@@ -109,4 +109,5 @@ Copyright (c) 2017 Damien Buhl alias daminetreg (damien.buhl@lecbna.org)
 ### Contributors
 Give them copyrights too !
 
+- René Roth (roth.rene@gmail.com) : [rothren](https://github.com/rothren)
 - Patrick Wieder (linkineo@linkineo.com) : [linkineo](https://github.com/linkineo)
